@@ -4,9 +4,9 @@ namespace App\Domain\User;
 
 use InvalidArgumentException;
 
-final class DisplayName
+final readonly class DisplayName
 {
-    private function __construct(private readonly string $value) {}
+    private function __construct(private string $value) {}
 
     public static function fromString(string $value): self
     {

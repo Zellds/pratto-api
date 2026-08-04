@@ -7,9 +7,9 @@ use App\Domain\User\Username;
 use App\Domain\User\UserRepositoryInterface;
 use RuntimeException;
 
-final class UpdateProfile
+final readonly class UpdateProfile
 {
-    public function __construct(private readonly UserRepositoryInterface $users) {}
+    public function __construct(private UserRepositoryInterface $users) {}
 
     public function __invoke(string $username, string $bio): UserProfileOutput
     {

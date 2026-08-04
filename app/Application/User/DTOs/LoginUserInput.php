@@ -2,10 +2,10 @@
 
 namespace App\Application\User\DTOs;
 
-final class LoginUserInput
+final readonly class LoginUserInput
 {
     public function __construct(
-        public readonly string $username,
-        public readonly string $password,
+        public string $username,
+        public string $password,
     ) {}
 }

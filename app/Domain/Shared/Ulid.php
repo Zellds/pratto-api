@@ -4,9 +4,9 @@ namespace App\Domain\Shared;
 
 use Symfony\Component\Uid\Ulid as SymfonyUlid;
 
-final class Ulid
+final readonly class Ulid
 {
-    private function __construct(private readonly string $value) {}
+    private function __construct(private string $value) {}
 
     public static function generate(): self
     {

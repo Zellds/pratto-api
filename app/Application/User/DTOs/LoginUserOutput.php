@@ -2,9 +2,9 @@
 
 namespace App\Application\User\DTOs;
 
-final class LoginUserOutput
+final readonly class LoginUserOutput
 {
     public function __construct(
-        public readonly string $token,
+        public string $token,
     ) {}
 }

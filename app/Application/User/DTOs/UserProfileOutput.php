@@ -2,12 +2,12 @@
 
 namespace App\Application\User\DTOs;
 
-final class UserProfileOutput
+final readonly class UserProfileOutput
 {
     public function __construct(
-        public readonly string $id,
-        public readonly string $username,
-        public readonly string $displayName,
-        public readonly ?string $bio,
+        public string $id,
+        public string $username,
+        public string $displayName,
+        public ?string $bio,
     ) {}
 }

@@ -10,11 +10,11 @@ use App\Domain\User\Username;
 use App\Domain\User\UserRepositoryInterface;
 use InvalidArgumentException;
 
-final class LoginUser
+final readonly class LoginUser
 {
     public function __construct(
-        private readonly UserRepositoryInterface $users,
-        private readonly AccessTokenIssuerInterface $tokens,
+        private UserRepositoryInterface $users,
+        private AccessTokenIssuerInterface $tokens,
     ) {}
 
     public function __invoke(LoginUserInput $input): LoginUserOutput

@@ -6,9 +6,9 @@ use App\Application\User\DTOs\UserProfileOutput;
 use App\Domain\User\Username;
 use App\Domain\User\UserRepositoryInterface;
 
-final class GetUserProfile
+final readonly class GetUserProfile
 {
-    public function __construct(private readonly UserRepositoryInterface $users) {}
+    public function __construct(private UserRepositoryInterface $users) {}
 
     public function __invoke(string $username): ?UserProfileOutput
     {
