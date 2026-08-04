@@ -8,6 +8,7 @@ use App\Domain\User\User;
 use App\Domain\User\Username;
 use App\Domain\User\UserRepositoryInterface;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser;
+use Illuminate\Support\Facades\Hash;
 
 final class EloquentUserRepository implements UserRepositoryInterface
 {
@@ -36,6 +37,31 @@ final class EloquentUserRepository implements UserRepositoryInterface
                 'password' => $password,
             ],
         );
+    }
+
+    public function setPassword(Ulid $id, string $plainPassword): void
+    {
+        EloquentUser::query()->whereKey($id->value())->update([
+            'password' => Hash::make($plainPassword),
+        ]);
+    }
+
+    public function verifyCredentials(Username $username, string $plainPassword): ?User
+    {
+        $record = EloquentUser::query()->where('username', $username->value())->first();
+
+        if ($record === null || ! Hash::check($plainPassword, $record->password)) {
+            return null;
+        }
+
+        return $this->toDomain($record);
+    }
+
+    public function issueToken(Ulid $id): string
+    {
+        $record = EloquentUser::query()->findOrFail($id->value());
+
+        return $record->createToken('api')->plainTextToken;
     }
 
     private function toDomain(EloquentUser $record): User

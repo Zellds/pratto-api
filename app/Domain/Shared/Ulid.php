@@ -6,13 +6,11 @@ use Symfony\Component\Uid\Ulid as SymfonyUlid;
 
 final class Ulid
 {
-    private function __construct(private readonly string $value)
-    {
-    }
+    private function __construct(private readonly string $value) {}
 
     public static function generate(): self
     {
-        return new self((string) new SymfonyUlid());
+        return new self((string) new SymfonyUlid);
     }
 
     public static function fromString(string $value): self

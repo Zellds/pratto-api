@@ -6,9 +6,7 @@ use InvalidArgumentException;
 
 final class DisplayName
 {
-    private function __construct(private readonly string $value)
-    {
-    }
+    private function __construct(private readonly string $value) {}
 
     public static function fromString(string $value): self
     {

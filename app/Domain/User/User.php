@@ -13,8 +13,7 @@ final class User
         private readonly Ulid $id,
         private readonly Username $username,
         private DisplayName $displayName,
-    ) {
-    }
+    ) {}
 
     public static function register(Ulid $id, Username $username, DisplayName $displayName): self
     {
