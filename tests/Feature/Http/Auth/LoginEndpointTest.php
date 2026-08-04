@@ -39,6 +39,11 @@ it('logs out and invalidates the token', function () {
 
     $response->assertNoContent();
 
+    // Sanctum's request guard caches the resolved user for the lifetime of the
+    // application instance. Without forgetting it here, the next request reusing
+    // this same container would still see the just-revoked token as authenticated.
+    $this->app->forgetInstance('auth');
+
     $me = $this->withHeader('Authorization', "Bearer {$token}")->getJson('/api/me');
     $me->assertStatus(401);
 });

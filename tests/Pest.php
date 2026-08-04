@@ -48,3 +48,17 @@ function something()
 {
     // ..
 }
+
+function authenticatedToken(TestCase $test): string
+{
+    $test->postJson('/api/register', [
+        'username' => 'gabriel',
+        'display_name' => 'Gabriel Medeiros',
+        'password' => 'senha-forte-123',
+    ]);
+
+    return $test->postJson('/api/login', [
+        'username' => 'gabriel',
+        'password' => 'senha-forte-123',
+    ])->json('token');
+}
