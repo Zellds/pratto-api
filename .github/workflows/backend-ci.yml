@@ -1,0 +1,49 @@
+name: backend-ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pratto
+          POSTGRES_PASSWORD: pratto
+          POSTGRES_DB: pratto_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Pint
+        run: vendor/bin/pint --test
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse
+      - name: PHPMD
+        run: vendor/bin/phpmd app text phpmd.xml
+      - name: Deptrac
+        run: vendor/bin/deptrac analyse
+      - name: Rector dry-run
+        run: vendor/bin/rector process --dry-run
+      - name: Pest
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: pratto_test
+          DB_USERNAME: pratto
+          DB_PASSWORD: pratto
+        run: vendor/bin/pest
