@@ -29,3 +29,13 @@ it('rejects registration with a duplicate username', function () {
         'password' => 'outra-senha-123',
     ])->assertStatus(422);
 });
+
+it('rejects registration with an invalid-format username', function () {
+    $response = $this->postJson('/api/register', [
+        'username' => 'Gabriel Medeiros',
+        'display_name' => 'Gabriel Medeiros',
+        'password' => 'senha-forte-123',
+    ]);
+
+    $response->assertStatus(422)->assertJsonValidationErrors('username');
+});
