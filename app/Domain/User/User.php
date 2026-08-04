@@ -43,10 +43,12 @@ final class User
 
     public function updateBio(string $bio): void
     {
-        if (mb_strlen($bio) > 280) {
+        $trimmed = trim($bio);
+
+        if (mb_strlen($trimmed) > 280) {
             throw new InvalidArgumentException('Bio cannot exceed 280 characters.');
         }
 
-        $this->bio = $bio;
+        $this->bio = $trimmed;
     }
 }
