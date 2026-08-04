@@ -14,6 +14,8 @@ class UserProfileController extends Controller
     {
         $profile = $getUserProfile($request->user()->username);
 
+        abort_if($profile === null, 404);
+
         return new UserProfileResource($profile);
     }
 
