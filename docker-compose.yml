@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - DB_HOST=postgres
+      - DB_DATABASE=pratto
+      - DB_USERNAME=pratto
+      - DB_PASSWORD=pratto
+    depends_on:
+      - postgres
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=pratto
+      - POSTGRES_PASSWORD=pratto
+      - POSTGRES_DB=pratto
+    ports:
+      - "5432:5432"
+    volumes:
+      - pratto_pgdata:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
+
+volumes:
+  pratto_pgdata:
