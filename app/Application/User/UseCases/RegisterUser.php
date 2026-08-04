@@ -11,9 +11,9 @@ use App\Domain\User\User;
 use App\Domain\User\Username;
 use App\Domain\User\UserRepositoryInterface;
 
-final class RegisterUser
+final readonly class RegisterUser
 {
-    public function __construct(private readonly UserRepositoryInterface $users) {}
+    public function __construct(private UserRepositoryInterface $users) {}
 
     public function __invoke(RegisterUserInput $input): UserProfileOutput
     {
@@ -25,8 +25,7 @@ final class RegisterUser
 
         $user = User::register(Ulid::generate(), $username, DisplayName::fromString($input->displayName));
 
-        $this->users->save($user);
-        $this->users->setPassword($user->id(), $input->password);
+        $this->users->registerWithPassword($user, $input->password);
 
         return new UserProfileOutput(
             $user->id()->value(),
