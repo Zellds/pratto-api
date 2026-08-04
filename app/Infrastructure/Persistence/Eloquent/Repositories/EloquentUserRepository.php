@@ -57,13 +57,6 @@ final class EloquentUserRepository implements UserRepositoryInterface
         return $this->toDomain($record);
     }
 
-    public function issueToken(Ulid $id): string
-    {
-        $record = EloquentUser::query()->findOrFail($id->value());
-
-        return $record->createToken('api')->plainTextToken;
-    }
-
     private function toDomain(EloquentUser $record): User
     {
         $user = User::register(

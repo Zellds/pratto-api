@@ -26,6 +26,7 @@ final class RegisterUser
         $user = User::register(Ulid::generate(), $username, DisplayName::fromString($input->displayName));
 
         $this->users->save($user);
+        $this->users->setPassword($user->id(), $input->password);
 
         return new UserProfileOutput(
             $user->id()->value(),

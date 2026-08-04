@@ -21,10 +21,4 @@ interface UserRepositoryInterface
      * stored credentials, or null otherwise.
      */
     public function verifyCredentials(Username $username, string $plainPassword): ?User;
-
-    /**
-     * Issues a new API access token for the user and returns its plain
-     * text representation.
-     */
-    public function issueToken(Ulid $id): string;
 }

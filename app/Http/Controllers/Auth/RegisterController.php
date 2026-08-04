@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
 use App\Domain\Shared\Ulid;
+use App\Domain\User\AccessTokenIssuerInterface;
 use App\Domain\User\DuplicateUsernameException;
-use App\Domain\User\UserRepositoryInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Resources\UserProfileResource;
@@ -18,7 +18,7 @@ class RegisterController extends Controller
     public function __invoke(
         RegisterUserRequest $request,
         RegisterUser $registerUser,
-        UserRepositoryInterface $users,
+        AccessTokenIssuerInterface $tokens,
     ): JsonResponse {
         try {
             $profile = $registerUser(new RegisterUserInput(
@@ -30,9 +30,7 @@ class RegisterController extends Controller
             throw ValidationException::withMessages(['username' => $exception->getMessage()]);
         }
 
-        $userId = Ulid::fromString($profile->id);
-        $users->setPassword($userId, $request->string('password')->value());
-        $token = $users->issueToken($userId);
+        $token = $tokens->issueFor(Ulid::fromString($profile->id));
 
         return response()->json([
             'token' => $token,
