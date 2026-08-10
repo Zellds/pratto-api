@@ -1,0 +1,126 @@
+<?php
+
+namespace App\Infrastructure\Persistence\Eloquent\Repositories;
+
+use App\Domain\Recipe\MeasurementUnit;
+use App\Domain\Recipe\Recipe;
+use App\Domain\Recipe\RecipeIngredient;
+use App\Domain\Recipe\RecipeRepositoryInterface;
+use App\Domain\Recipe\RecipeStatus;
+use App\Domain\Recipe\RecipeStep;
+use App\Domain\Shared\Ulid;
+use App\Infrastructure\Persistence\Eloquent\Models\EloquentRecipe;
+use App\Infrastructure\Persistence\Eloquent\Models\EloquentRecipeIngredient;
+use App\Infrastructure\Persistence\Eloquent\Models\EloquentRecipeStep;
+use Illuminate\Support\Facades\DB;
+
+final class EloquentRecipeRepository implements RecipeRepositoryInterface
+{
+    public function findById(Ulid $id): ?Recipe
+    {
+        $record = EloquentRecipe::query()->with(['ingredients', 'steps'])->find($id->value());
+
+        return $record === null ? null : $this->toDomain($record);
+    }
+
+    public function save(Recipe $recipe): void
+    {
+        DB::transaction(function () use ($recipe): void {
+            $record = EloquentRecipe::query()->updateOrCreate(
+                ['id' => $recipe->id()->value()],
+                [
+                    'user_id' => $recipe->ownerId()->value(),
+                    'title' => $recipe->title(),
+                    'description' => $recipe->description(),
+                    'portions' => $recipe->portions(),
+                    'prep_time_minutes' => $recipe->prepTimeMinutes(),
+                    'status' => $recipe->status()->value,
+                ],
+            );
+
+            $record->ingredients()->delete();
+            foreach ($recipe->ingredients() as $ingredient) {
+                $record->ingredients()->create([
+                    'ingredient_id' => $ingredient->ingredientId()->value(),
+                    'quantity' => $ingredient->quantity(),
+                    'unit' => $ingredient->unit()->value,
+                    'position' => $ingredient->position(),
+                ]);
+            }
+
+            $record->steps()->delete();
+            foreach ($recipe->steps() as $step) {
+                $record->steps()->create([
+                    'position' => $step->position(),
+                    'instruction' => $step->instruction(),
+                ]);
+            }
+
+            $this->refreshSearchVector($record);
+        });
+    }
+
+    public function delete(Ulid $id): void
+    {
+        EloquentRecipe::query()->whereKey($id->value())->delete();
+    }
+
+    public function search(?string $term, ?Ulid $ownerId, int $page, int $perPage): array
+    {
+        $query = EloquentRecipe::query()->with(['ingredients', 'steps']);
+
+        if ($ownerId !== null) {
+            $query->where('user_id', $ownerId->value());
+        } else {
+            $query->whereIn('status', [RecipeStatus::PendingReview->value, RecipeStatus::Published->value]);
+        }
+
+        if ($term !== null && trim($term) !== '') {
+            $query->whereRaw("search_vector @@ plainto_tsquery('portuguese', ?)", [$term]);
+        }
+
+        $records = $query->orderByDesc('created_at')->forPage($page, $perPage)->get();
+
+        return $records->map(fn (EloquentRecipe $record) => $this->toDomain($record))->all();
+    }
+
+    private function refreshSearchVector(EloquentRecipe $record): void
+    {
+        $ingredientNames = DB::table('recipe_ingredients')
+            ->join('ingredients', 'ingredients.id', '=', 'recipe_ingredients.ingredient_id')
+            ->where('recipe_ingredients.recipe_id', $record->id)
+            ->pluck('ingredients.name')
+            ->implode(' ');
+
+        $searchable = trim($record->title.' '.$record->description.' '.$ingredientNames);
+
+        DB::statement("UPDATE recipes SET search_vector = to_tsvector('portuguese', ?) WHERE id = ?", [$searchable, $record->id]);
+    }
+
+    private function toDomain(EloquentRecipe $record): Recipe
+    {
+        $ingredients = $record->ingredients->map(fn (EloquentRecipeIngredient $line) => RecipeIngredient::create(
+            Ulid::fromString($line->ingredient_id),
+            (float) $line->quantity,
+            MeasurementUnit::from($line->unit),
+            $line->position,
+        ))->all();
+
+        $steps = $record->steps->map(fn (EloquentRecipeStep $step) => RecipeStep::create(
+            $step->position,
+            $step->instruction,
+        ))->all();
+
+        return Recipe::reconstitute(
+            Ulid::fromString($record->id),
+            Ulid::fromString($record->user_id),
+            $record->title,
+            $record->description,
+            $record->portions,
+            $record->prep_time_minutes,
+            RecipeStatus::from($record->status),
+            $ingredients,
+            $steps,
+        );
+    }
+}
