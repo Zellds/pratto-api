@@ -1,0 +1,26 @@
+<?php
+// app/Application/Recipe/UseCases/GetRecipe.php
+
+namespace App\Application\Recipe\UseCases;
+
+use App\Application\Recipe\DTOs\RecipeOutput;
+use App\Domain\Recipe\RecipeNotFoundException;
+use App\Domain\Recipe\RecipeRepositoryInterface;
+use App\Domain\Shared\Ulid;
+
+final readonly class GetRecipe
+{
+    public function __construct(private RecipeRepositoryInterface $recipes) {}
+
+    public function __invoke(string $recipeId, ?string $viewerId, ?int $requestedPortions): RecipeOutput
+    {
+        $recipe = $this->recipes->findById(Ulid::fromString($recipeId));
+        $viewer = $viewerId === null ? null : Ulid::fromString($viewerId);
+
+        if ($recipe === null || ! $recipe->isVisibleTo($viewer)) {
+            throw RecipeNotFoundException::forId(Ulid::fromString($recipeId));
+        }
+
+        return RecipeOutput::fromDomain($recipe, $requestedPortions);
+    }
+}
