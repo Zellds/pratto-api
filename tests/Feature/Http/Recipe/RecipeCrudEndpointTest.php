@@ -58,6 +58,47 @@ it('publishes a draft recipe', function () {
     $response->assertOk()->assertJsonPath('status', 'pending_review');
 });
 
+it('rejects publishing an already-published recipe with a conflict', function () {
+    $token = authenticatedToken($this);
+    $recipeId = $this->withHeader('Authorization', "Bearer {$token}")->postJson('/api/recipes', recipePayload())->json('id');
+    $this->withHeader('Authorization', "Bearer {$token}")->postJson("/api/recipes/{$recipeId}/publish")->assertOk();
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson("/api/recipes/{$recipeId}/publish")
+        ->assertStatus(409);
+});
+
+it('scales ingredient quantities when reading a recipe with ?portions', function () {
+    $token = authenticatedToken($this);
+    $recipeId = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload([
+            'portions' => 4,
+            'ingredients' => [
+                ['ingredient_name' => 'Farinha', 'quantity' => 2.0, 'unit' => 'g', 'position' => 0],
+            ],
+        ]))->json('id');
+    $this->withHeader('Authorization', "Bearer {$token}")->postJson("/api/recipes/{$recipeId}/publish");
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->getJson("/api/recipes/{$recipeId}?portions=8");
+
+    $response->assertOk()->assertJsonPath('ingredients.0.quantity', 4);
+});
+
+it('finds recipes by full-text search on ?q', function () {
+    $token = authenticatedToken($this);
+    $chocolateId = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload(['title' => 'Bolo de chocolate']))->json('id');
+    $saltyId = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload(['title' => 'Torta salgada']))->json('id');
+    $this->withHeader('Authorization', "Bearer {$token}")->postJson("/api/recipes/{$chocolateId}/publish");
+    $this->withHeader('Authorization', "Bearer {$token}")->postJson("/api/recipes/{$saltyId}/publish");
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")->getJson('/api/recipes?q=chocolate');
+
+    $response->assertOk()->assertJsonCount(1)->assertJsonPath('0.title', 'Bolo de chocolate');
+});
+
 it('deletes a recipe (soft delete) and it stops being retrievable', function () {
     $token = authenticatedToken($this);
     $recipeId = $this->withHeader('Authorization', "Bearer {$token}")->postJson('/api/recipes', recipePayload())->json('id');

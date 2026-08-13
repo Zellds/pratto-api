@@ -12,6 +12,7 @@ use App\Application\Recipe\UseCases\GetRecipe;
 use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Application\Recipe\UseCases\SearchRecipes;
 use App\Application\Recipe\UseCases\UpdateRecipe;
+use App\Domain\Recipe\InvalidRecipeStatusTransitionException;
 use App\Domain\Recipe\RecipeNotFoundException;
 use App\Domain\Recipe\RecipeNotOwnedException;
 use App\Http\Requests\StoreRecipeRequest;
@@ -69,6 +70,8 @@ class RecipeController extends Controller
             abort(404);
         } catch (RecipeNotOwnedException) {
             abort(403);
+        } catch (InvalidRecipeStatusTransitionException $exception) {
+            abort(409, $exception->getMessage());
         }
 
         return new RecipeResource($output);
