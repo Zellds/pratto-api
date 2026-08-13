@@ -5,6 +5,12 @@ namespace App\Domain\Recipe;
 use App\Domain\Shared\Ulid;
 use InvalidArgumentException;
 
+/**
+ * Aggregate root for a recipe: owner, content (title/description/portions/prep time),
+ * ingredients, steps and its publication status.
+ *
+ * @SuppressWarnings("PHPMD.TooManyPublicMethods")
+ */
 final class Recipe
 {
     /**
