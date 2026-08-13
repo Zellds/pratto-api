@@ -62,3 +62,33 @@ function authenticatedToken(TestCase $test): string
         'password' => 'senha-forte-123',
     ])->json('token');
 }
+
+function authenticatedTokenFor(TestCase $test, string $username): string
+{
+    $test->postJson('/api/register', [
+        'username' => $username,
+        'display_name' => ucfirst($username),
+        'password' => 'senha-forte-123',
+    ]);
+
+    return $test->postJson('/api/login', [
+        'username' => $username,
+        'password' => 'senha-forte-123',
+    ])->json('token');
+}
+
+function recipePayload(array $overrides = []): array
+{
+    return array_merge([
+        'title' => 'Bolo de cenoura',
+        'description' => 'Bolo simples e rápido',
+        'portions' => 8,
+        'prep_time_minutes' => 60,
+        'ingredients' => [
+            ['ingredient_name' => 'Cenoura', 'quantity' => 3, 'unit' => 'unidade', 'position' => 0],
+        ],
+        'steps' => [
+            ['position' => 0, 'instruction' => 'Bata tudo no liquidificador.'],
+        ],
+    ], $overrides);
+}

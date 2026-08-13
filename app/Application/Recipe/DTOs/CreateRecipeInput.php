@@ -1,4 +1,5 @@
 <?php
+
 // app/Application/Recipe/DTOs/CreateRecipeInput.php
 
 namespace App\Application\Recipe\DTOs;
@@ -6,8 +7,8 @@ namespace App\Application\Recipe\DTOs;
 final readonly class CreateRecipeInput
 {
     /**
-     * @param list<RecipeIngredientInput> $ingredients
-     * @param list<RecipeStepInput> $steps
+     * @param  list<RecipeIngredientInput>  $ingredients
+     * @param  list<RecipeStepInput>  $steps
      */
     public function __construct(
         public string $ownerId,

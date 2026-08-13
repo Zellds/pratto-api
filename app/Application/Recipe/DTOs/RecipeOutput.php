@@ -1,4 +1,5 @@
 <?php
+
 // app/Application/Recipe/DTOs/RecipeOutput.php
 
 namespace App\Application\Recipe\DTOs;
@@ -8,8 +9,8 @@ use App\Domain\Recipe\Recipe;
 final readonly class RecipeOutput
 {
     /**
-     * @param list<RecipeIngredientOutput> $ingredients
-     * @param list<RecipeStepOutput> $steps
+     * @param  list<RecipeIngredientOutput>  $ingredients
+     * @param  list<RecipeStepOutput>  $steps
      */
     public function __construct(
         public string $id,

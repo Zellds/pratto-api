@@ -2,9 +2,9 @@
 
 use App\Application\Ingredient\DTOs\ResolveIngredientInput;
 use App\Application\Ingredient\UseCases\ResolveIngredient;
-use App\Domain\Ingredient\IngredientRepositoryInterface;
 use App\Domain\Ingredient\IngredientStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\Uid\Ulid;
 
 uses(RefreshDatabase::class);
 
@@ -40,5 +40,5 @@ it('fails when neither id nor name is given', function () {
 })->throws(InvalidArgumentException::class);
 
 it('fails when the given id does not exist', function () {
-    app(ResolveIngredient::class)(new ResolveIngredientInput((string) \Symfony\Component\Uid\Ulid::generate(), null));
+    app(ResolveIngredient::class)(new ResolveIngredientInput((string) Ulid::generate(), null));
 })->throws(RuntimeException::class);

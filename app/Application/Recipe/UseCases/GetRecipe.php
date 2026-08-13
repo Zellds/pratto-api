@@ -1,4 +1,5 @@
 <?php
+
 // app/Application/Recipe/UseCases/GetRecipe.php
 
 namespace App\Application\Recipe\UseCases;

@@ -18,11 +18,17 @@ class EloquentRecipe extends Model
         'id', 'user_id', 'title', 'description', 'portions', 'prep_time_minutes', 'status', 'cover_media_id',
     ];
 
+    /**
+     * @return HasMany<EloquentRecipeIngredient, $this>
+     */
     public function ingredients(): HasMany
     {
         return $this->hasMany(EloquentRecipeIngredient::class, 'recipe_id')->orderBy('position');
     }
 
+    /**
+     * @return HasMany<EloquentRecipeStep, $this>
+     */
     public function steps(): HasMany
     {
         return $this->hasMany(EloquentRecipeStep::class, 'recipe_id')->orderBy('position');

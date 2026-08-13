@@ -8,8 +8,8 @@ use InvalidArgumentException;
 final class Recipe
 {
     /**
-     * @param list<RecipeIngredient> $ingredients
-     * @param list<RecipeStep> $steps
+     * @param  list<RecipeIngredient>  $ingredients
+     * @param  list<RecipeStep>  $steps
      */
     private function __construct(
         private readonly Ulid $id,
@@ -24,8 +24,8 @@ final class Recipe
     ) {}
 
     /**
-     * @param list<RecipeIngredient> $ingredients
-     * @param list<RecipeStep> $steps
+     * @param  list<RecipeIngredient>  $ingredients
+     * @param  list<RecipeStep>  $steps
      */
     public static function create(
         Ulid $id,
@@ -44,8 +44,8 @@ final class Recipe
     }
 
     /**
-     * @param list<RecipeIngredient> $ingredients
-     * @param list<RecipeStep> $steps
+     * @param  list<RecipeIngredient>  $ingredients
+     * @param  list<RecipeStep>  $steps
      */
     public static function reconstitute(
         Ulid $id,
@@ -62,8 +62,8 @@ final class Recipe
     }
 
     /**
-     * @param list<RecipeIngredient> $ingredients
-     * @param list<RecipeStep> $steps
+     * @param  list<RecipeIngredient>  $ingredients
+     * @param  list<RecipeStep>  $steps
      */
     public function update(
         string $title,
@@ -121,8 +121,8 @@ final class Recipe
     }
 
     /**
-     * @param list<RecipeIngredient> $ingredients
-     * @param list<RecipeStep> $steps
+     * @param  list<RecipeIngredient>  $ingredients
+     * @param  list<RecipeStep>  $steps
      */
     private function applyContent(
         string $title,

@@ -1,4 +1,5 @@
 <?php
+
 // app/Application/Recipe/UseCases/DeleteRecipe.php
 
 namespace App\Application\Recipe\UseCases;

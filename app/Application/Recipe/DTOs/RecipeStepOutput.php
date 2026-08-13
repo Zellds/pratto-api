@@ -1,4 +1,5 @@
 <?php
+
 // app/Application/Recipe/DTOs/RecipeStepOutput.php
 
 namespace App\Application\Recipe\DTOs;

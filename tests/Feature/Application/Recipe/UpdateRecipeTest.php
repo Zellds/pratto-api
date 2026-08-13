@@ -1,8 +1,10 @@
 <?php
+
 // tests/Feature/Application/Recipe/UpdateRecipeTest.php
 
 use App\Application\Recipe\DTOs\CreateRecipeInput;
 use App\Application\Recipe\DTOs\RecipeIngredientInput;
+use App\Application\Recipe\DTOs\RecipeOutput;
 use App\Application\Recipe\DTOs\RecipeStepInput;
 use App\Application\Recipe\DTOs\UpdateRecipeInput;
 use App\Application\Recipe\UseCases\CreateRecipe;
@@ -15,7 +17,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function createADraft(string $ownerId): \App\Application\Recipe\DTOs\RecipeOutput
+function createADraft(string $ownerId): RecipeOutput
 {
     return app(CreateRecipe::class)(new CreateRecipeInput(
         $ownerId, 'Bolo', 'Bolo simples', 8, 60,

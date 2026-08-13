@@ -1,11 +1,11 @@
 <?php
+
 // tests/Feature/Application/Recipe/SearchRecipesTest.php
 
 use App\Application\Recipe\DTOs\CreateRecipeInput;
 use App\Application\Recipe\DTOs\RecipeIngredientInput;
 use App\Application\Recipe\DTOs\RecipeStepInput;
 use App\Application\Recipe\UseCases\CreateRecipe;
-use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Application\Recipe\UseCases\SearchRecipes;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;

@@ -1,4 +1,5 @@
 <?php
+
 // tests/Feature/Application/Recipe/DeleteRecipeTest.php
 
 use App\Application\Recipe\DTOs\CreateRecipeInput;
@@ -31,5 +32,5 @@ it('soft deletes the owned recipe', function () {
 it('fails when the recipe does not exist', function () {
     $owner = app(RegisterUser::class)(new RegisterUserInput('gabriel', 'Gabriel', 'senha-forte-123'));
 
-    app(DeleteRecipe::class)((string) \Symfony\Component\Uid\Ulid::generate(), $owner->id);
+    app(DeleteRecipe::class)((string) Symfony\Component\Uid\Ulid::generate(), $owner->id);
 })->throws(RecipeNotFoundException::class);

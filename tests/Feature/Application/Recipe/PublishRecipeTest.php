@@ -1,4 +1,5 @@
 <?php
+
 // tests/Feature/Application/Recipe/PublishRecipeTest.php
 
 use App\Application\Recipe\DTOs\CreateRecipeInput;
