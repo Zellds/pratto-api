@@ -4,12 +4,12 @@ namespace App\Domain\Ingredient;
 
 use App\Domain\Shared\Ulid;
 
-final class Ingredient
+final readonly class Ingredient
 {
     private function __construct(
-        private readonly Ulid $id,
-        private readonly IngredientName $name,
-        private readonly IngredientStatus $status,
+        private Ulid $id,
+        private IngredientName $name,
+        private IngredientStatus $status,
     ) {}
 
     public static function createProvisional(Ulid $id, IngredientName $name): self
