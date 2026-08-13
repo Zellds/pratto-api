@@ -1,5 +1,18 @@
 <?php
 
+use App\Application\Ingredient\DTOs\ResolveIngredientInput;
+use App\Application\Ingredient\UseCases\ResolveIngredient;
+use App\Application\Recipe\DTOs\CreateRecipeInput;
+use App\Application\Recipe\DTOs\RecipeIngredientInput;
+use App\Application\Recipe\DTOs\RecipeOutput;
+use App\Application\Recipe\DTOs\RecipeStepInput;
+use App\Application\Recipe\UseCases\CreateRecipe;
+use App\Application\User\DTOs\RegisterUserInput;
+use App\Application\User\UseCases\RegisterUser;
+use App\Domain\Recipe\MeasurementUnit;
+use App\Domain\Recipe\RecipeIngredient;
+use App\Domain\Recipe\RecipeStep;
+use App\Domain\Shared\Ulid;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -75,6 +88,37 @@ function authenticatedTokenFor(TestCase $test, string $username): string
         'username' => $username,
         'password' => 'senha-forte-123',
     ])->json('token');
+}
+
+function aLine(): RecipeIngredient
+{
+    return RecipeIngredient::create(Ulid::generate(), 2.0, MeasurementUnit::Gram, 0);
+}
+
+function aStep(): RecipeStep
+{
+    return RecipeStep::create(0, 'Misture tudo.');
+}
+
+function anOwner(): Ulid
+{
+    $profile = app(RegisterUser::class)(new RegisterUserInput('gabriel', 'Gabriel', 'senha-forte-123'));
+
+    return Ulid::fromString($profile->id);
+}
+
+function anIngredientId(string $name = 'Tomate'): Ulid
+{
+    return app(ResolveIngredient::class)(new ResolveIngredientInput(null, $name))->id();
+}
+
+function createADraft(string $ownerId): RecipeOutput
+{
+    return app(CreateRecipe::class)(new CreateRecipeInput(
+        $ownerId, 'Bolo', 'Bolo simples', 8, 60,
+        [new RecipeIngredientInput(null, 'Cenoura', 1.0, 'unidade', 0)],
+        [new RecipeStepInput(0, 'Misture.')],
+    ));
 }
 
 function recipePayload(array $overrides = []): array

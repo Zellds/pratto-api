@@ -6,18 +6,7 @@ use App\Domain\Recipe\Recipe;
 use App\Domain\Recipe\RecipeIngredient;
 use App\Domain\Recipe\RecipeNotOwnedException;
 use App\Domain\Recipe\RecipeStatus;
-use App\Domain\Recipe\RecipeStep;
 use App\Domain\Shared\Ulid;
-
-function aLine(): RecipeIngredient
-{
-    return RecipeIngredient::create(Ulid::generate(), 2.0, MeasurementUnit::Gram, 0);
-}
-
-function aStep(): RecipeStep
-{
-    return RecipeStep::create(0, 'Misture tudo.');
-}
 
 it('is created as draft', function () {
     $recipe = Recipe::create(Ulid::generate(), Ulid::generate(), 'Bolo', 'Bolo simples', 8, 60, [aLine()], [aStep()]);

@@ -1,9 +1,5 @@
 <?php
 
-use App\Application\Ingredient\DTOs\ResolveIngredientInput;
-use App\Application\Ingredient\UseCases\ResolveIngredient;
-use App\Application\User\DTOs\RegisterUserInput;
-use App\Application\User\UseCases\RegisterUser;
 use App\Domain\Recipe\MeasurementUnit;
 use App\Domain\Recipe\Recipe;
 use App\Domain\Recipe\RecipeIngredient;
@@ -14,18 +10,6 @@ use App\Domain\Shared\Ulid;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
-
-function anOwner(): Ulid
-{
-    $profile = app(RegisterUser::class)(new RegisterUserInput('gabriel', 'Gabriel', 'senha-forte-123'));
-
-    return Ulid::fromString($profile->id);
-}
-
-function anIngredientId(string $name = 'Tomate'): Ulid
-{
-    return app(ResolveIngredient::class)(new ResolveIngredientInput(null, $name))->id();
-}
 
 it('saves a recipe with its ingredients and steps and finds it back, ordered by position', function () {
     $repository = app(RecipeRepositoryInterface::class);

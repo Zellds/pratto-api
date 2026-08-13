@@ -2,12 +2,9 @@
 
 // tests/Feature/Application/Recipe/UpdateRecipeTest.php
 
-use App\Application\Recipe\DTOs\CreateRecipeInput;
 use App\Application\Recipe\DTOs\RecipeIngredientInput;
-use App\Application\Recipe\DTOs\RecipeOutput;
 use App\Application\Recipe\DTOs\RecipeStepInput;
 use App\Application\Recipe\DTOs\UpdateRecipeInput;
-use App\Application\Recipe\UseCases\CreateRecipe;
 use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Application\Recipe\UseCases\UpdateRecipe;
 use App\Application\User\DTOs\RegisterUserInput;
@@ -16,15 +13,6 @@ use App\Domain\Recipe\RecipeNotOwnedException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
-
-function createADraft(string $ownerId): RecipeOutput
-{
-    return app(CreateRecipe::class)(new CreateRecipeInput(
-        $ownerId, 'Bolo', 'Bolo simples', 8, 60,
-        [new RecipeIngredientInput(null, 'Cenoura', 1.0, 'unidade', 0)],
-        [new RecipeStepInput(0, 'Misture.')],
-    ));
-}
 
 it('updates the recipe and resets a pending_review recipe back to draft', function () {
     $owner = app(RegisterUser::class)(new RegisterUserInput('gabriel', 'Gabriel', 'senha-forte-123'));
