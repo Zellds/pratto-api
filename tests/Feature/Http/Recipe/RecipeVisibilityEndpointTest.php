@@ -52,3 +52,30 @@ it('excludes drafts from public search but includes them with ?mine=true', funct
 it('rejects ?mine=true without authentication', function () {
     $this->getJson('/api/recipes?mine=1')->assertStatus(401);
 });
+
+it('allows ?mine=0 for anonymous users and returns public recipes', function () {
+    $token = authenticatedToken($this);
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload());
+
+    $this->app['auth']->forgetGuards();
+    $this->withoutHeader('Authorization')->getJson('/api/recipes?mine=0')->assertOk()->assertJsonCount(0);
+});
+
+it('returns public listing for authenticated user with ?mine=0', function () {
+    $token = authenticatedToken($this);
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload());
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->getJson('/api/recipes?mine=0')->assertOk()->assertJsonCount(0);
+});
+
+it('allows ?mine=false for anonymous users and returns public recipes', function () {
+    $token = authenticatedToken($this);
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload());
+
+    $this->app['auth']->forgetGuards();
+    $this->withoutHeader('Authorization')->getJson('/api/recipes?mine=false')->assertOk()->assertJsonCount(0);
+});

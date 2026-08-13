@@ -105,13 +105,13 @@ class RecipeController extends Controller
     {
         $data = $request->validate([
             'q' => ['nullable', 'string', 'max:120'],
-            'mine' => ['nullable', 'boolean'],
+            'mine' => ['nullable', 'in:0,1,true,false'],
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $mineOwnerId = null;
 
-        if ($data['mine'] ?? false) {
+        if ($request->boolean('mine')) {
             $viewer = $request->user('sanctum');
             abort_if($viewer === null, 401);
             $mineOwnerId = $viewer->id;
