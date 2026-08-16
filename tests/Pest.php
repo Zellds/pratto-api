@@ -2,6 +2,9 @@
 
 use App\Application\Ingredient\DTOs\ResolveIngredientInput;
 use App\Application\Ingredient\UseCases\ResolveIngredient;
+use App\Application\Media\DTOs\MediaOutput;
+use App\Application\Media\DTOs\UploadMediaInput;
+use App\Application\Media\UseCases\UploadMedia;
 use App\Application\Recipe\DTOs\CreateRecipeInput;
 use App\Application\Recipe\DTOs\RecipeIngredientInput;
 use App\Application\Recipe\DTOs\RecipeOutput;
@@ -13,7 +16,9 @@ use App\Domain\Recipe\MeasurementUnit;
 use App\Domain\Recipe\RecipeIngredient;
 use App\Domain\Recipe\RecipeStep;
 use App\Domain\Shared\Ulid;
+use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /*
@@ -138,4 +143,33 @@ function recipePayload(array $overrides = []): array
             ['position' => 0, 'instruction' => 'Bata tudo no liquidificador.'],
         ],
     ], $overrides);
+}
+
+function anAdmin(): Ulid
+{
+    $owner = anOwner();
+
+    EloquentUser::query()
+        ->whereKey($owner->value())
+        ->update(['role' => 'admin']);
+
+    return $owner;
+}
+
+function anApprovedAvatar(string $ownerId): MediaOutput
+{
+    Storage::fake('media');
+
+    return app(UploadMedia::class)(
+        new UploadMediaInput($ownerId, 'avatar', base_path('tests/fixtures/media/valid.jpg'), null, null),
+    );
+}
+
+function aPendingRecipePhoto(string $ownerId): MediaOutput
+{
+    Storage::fake('media');
+
+    return app(UploadMedia::class)(
+        new UploadMediaInput($ownerId, 'recipe_photo', base_path('tests/fixtures/media/valid.jpg'), null, null),
+    );
 }
