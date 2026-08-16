@@ -102,7 +102,10 @@ function aStep(): RecipeStep
 
 function anOwner(): Ulid
 {
-    $profile = app(RegisterUser::class)(new RegisterUserInput('gabriel', 'Gabriel', 'senha-forte-123'));
+    // Suffixed so a single test can register more than one distinct owner
+    // (e.g. an uploader and a reviewer) without a duplicate-username clash.
+    $username = 'gabriel_'.mb_strtolower(substr((string) Ulid::generate()->value(), -8));
+    $profile = app(RegisterUser::class)(new RegisterUserInput($username, 'Gabriel', 'senha-forte-123'));
 
     return Ulid::fromString($profile->id);
 }

@@ -3,14 +3,21 @@
 namespace App\Infrastructure\Providers;
 
 use App\Domain\Ingredient\IngredientRepositoryInterface;
+use App\Domain\Media\Contracts\ImageProcessorInterface;
+use App\Domain\Media\Contracts\MediaRepositoryInterface;
+use App\Domain\Media\Contracts\MediaUrlSignerInterface;
 use App\Domain\Recipe\RecipeRepositoryInterface;
 use App\Domain\User\AccessTokenIssuerInterface;
 use App\Domain\User\UserRepositoryInterface;
 use App\Infrastructure\Auth\SanctumAccessTokenIssuer;
+use App\Infrastructure\Media\ImagePipeline;
+use App\Infrastructure\Media\TemporaryMediaUrlSigner;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentIngredientRepository;
+use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentMediaRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentRecipeRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
 use Illuminate\Support\ServiceProvider;
+use Intervention\Image\ImageManager;
 
 final class DomainServiceProvider extends ServiceProvider
 {
@@ -21,5 +28,9 @@ final class DomainServiceProvider extends ServiceProvider
         $this->app->bind(AccessTokenIssuerInterface::class, SanctumAccessTokenIssuer::class);
         $this->app->bind(IngredientRepositoryInterface::class, EloquentIngredientRepository::class);
         $this->app->bind(RecipeRepositoryInterface::class, EloquentRecipeRepository::class);
+        $this->app->bind(MediaRepositoryInterface::class, EloquentMediaRepository::class);
+        $this->app->singleton(ImageManager::class, static fn () => ImageManager::gd());
+        $this->app->bind(ImageProcessorInterface::class, ImagePipeline::class);
+        $this->app->bind(MediaUrlSignerInterface::class, TemporaryMediaUrlSigner::class);
     }
 }
