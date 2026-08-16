@@ -3,7 +3,7 @@
 namespace App\Application\Recipe\Concerns;
 
 use App\Domain\Media\Contracts\MediaRepositoryInterface;
-use App\Domain\Recipe\CoverMediaNotOwnedException;
+use App\Domain\Recipe\Exceptions\CoverMediaNotOwnedException;
 use App\Domain\Shared\Ulid;
 
 trait ValidatesCoverMedia

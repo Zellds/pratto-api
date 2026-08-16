@@ -8,7 +8,7 @@ use App\Application\Recipe\DTOs\RecipeStepInput;
 use App\Application\Recipe\UseCases\CreateRecipe;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
-use App\Domain\Recipe\CoverMediaNotOwnedException;
+use App\Domain\Recipe\Exceptions\CoverMediaNotOwnedException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

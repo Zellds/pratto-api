@@ -12,7 +12,7 @@ use App\Application\Recipe\UseCases\GetRecipe;
 use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Application\Recipe\UseCases\SearchRecipes;
 use App\Application\Recipe\UseCases\UpdateRecipe;
-use App\Domain\Recipe\CoverMediaNotOwnedException;
+use App\Domain\Recipe\Exceptions\CoverMediaNotOwnedException;
 use App\Domain\Recipe\InvalidRecipeStatusTransitionException;
 use App\Domain\Recipe\RecipeNotFoundException;
 use App\Domain\Recipe\RecipeNotOwnedException;
