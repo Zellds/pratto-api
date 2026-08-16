@@ -102,3 +102,16 @@ it('returns the original ingredients when no portions are requested', function (
 
     expect($recipe->scaledIngredients(null))->toBe($recipe->ingredients());
 });
+
+it('starts with no cover media', function () {
+    $recipe = Recipe::create(Ulid::generate(), Ulid::generate(), 'Bolo', 'Descrição', 4, 30, [aLine()], [aStep()]);
+
+    expect($recipe->coverMediaId())->toBeNull();
+});
+
+it('accepts a cover media id', function () {
+    $coverId = Ulid::generate();
+    $recipe = Recipe::create(Ulid::generate(), Ulid::generate(), 'Bolo', 'Descrição', 4, 30, [aLine()], [aStep()], $coverId);
+
+    expect($recipe->coverMediaId()->equals($coverId))->toBeTrue();
+});

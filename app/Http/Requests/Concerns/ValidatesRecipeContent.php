@@ -23,6 +23,7 @@ trait ValidatesRecipeContent
             'steps' => ['required', 'array', 'min:1'],
             'steps.*.position' => ['required', 'integer', 'min:0'],
             'steps.*.instruction' => ['required', 'string', 'max:1000'],
+            'cover_media_id' => ['nullable', 'string', 'exists:media,id'],
         ];
     }
 }

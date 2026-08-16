@@ -8,6 +8,7 @@ use App\Application\Recipe\DTOs\RecipeStepInput;
 use App\Application\Recipe\UseCases\CreateRecipe;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
+use App\Domain\Recipe\CoverMediaNotOwnedException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -30,3 +31,29 @@ it('creates a draft recipe, resolving a brand-new ingredient by name', function 
         ->and($output->ingredients)->toHaveCount(1)
         ->and($output->ingredients[0]->quantity)->toBe(3.0);
 });
+
+it('accepts a cover media owned by the same user', function () {
+    $owner = anOwner();
+    $cover = anApprovedAvatar($owner->value());
+
+    $output = app(CreateRecipe::class)(new CreateRecipeInput(
+        $owner->value(), 'Bolo', 'Descrição', 4, 30,
+        [new RecipeIngredientInput(null, 'Farinha', 1.0, 'unidade', 0)],
+        [new RecipeStepInput(0, 'Misture.')],
+        $cover->id,
+    ));
+
+    expect($output->coverMediaId)->toBe($cover->id);
+});
+
+it('rejects a cover media owned by someone else', function () {
+    $owner = anOwner();
+    $strangerCover = anApprovedAvatar(anOwner()->value());
+
+    app(CreateRecipe::class)(new CreateRecipeInput(
+        $owner->value(), 'Bolo', 'Descrição', 4, 30,
+        [new RecipeIngredientInput(null, 'Farinha', 1.0, 'unidade', 0)],
+        [new RecipeStepInput(0, 'Misture.')],
+        $strangerCover->id,
+    ));
+})->throws(CoverMediaNotOwnedException::class);

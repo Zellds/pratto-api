@@ -35,6 +35,7 @@ final class EloquentRecipeRepository implements RecipeRepositoryInterface
                     'portions' => $recipe->portions(),
                     'prep_time_minutes' => $recipe->prepTimeMinutes(),
                     'status' => $recipe->status()->value,
+                    'cover_media_id' => $recipe->coverMediaId()?->value(),
                 ],
             );
 
@@ -121,6 +122,7 @@ final class EloquentRecipeRepository implements RecipeRepositoryInterface
             RecipeStatus::from($record->status),
             $ingredients,
             $steps,
+            $record->cover_media_id !== null ? Ulid::fromString($record->cover_media_id) : null,
         );
     }
 }

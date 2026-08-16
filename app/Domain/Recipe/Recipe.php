@@ -27,6 +27,7 @@ final class Recipe
         private RecipeStatus $status,
         private array $ingredients,
         private array $steps,
+        private ?Ulid $coverMediaId = null,
     ) {}
 
     /**
@@ -42,8 +43,9 @@ final class Recipe
         int $prepTimeMinutes,
         array $ingredients,
         array $steps,
+        ?Ulid $coverMediaId = null,
     ): self {
-        $recipe = new self($id, $ownerId, '', '', 1, 1, RecipeStatus::Draft, [], []);
+        $recipe = new self($id, $ownerId, '', '', 1, 1, RecipeStatus::Draft, [], [], $coverMediaId);
         $recipe->applyContent($title, $description, $portions, $prepTimeMinutes, $ingredients, $steps);
 
         return $recipe;
@@ -63,8 +65,9 @@ final class Recipe
         RecipeStatus $status,
         array $ingredients,
         array $steps,
+        ?Ulid $coverMediaId = null,
     ): self {
-        return new self($id, $ownerId, $title, $description, $portions, $prepTimeMinutes, $status, $ingredients, $steps);
+        return new self($id, $ownerId, $title, $description, $portions, $prepTimeMinutes, $status, $ingredients, $steps, $coverMediaId);
     }
 
     /**
@@ -78,8 +81,10 @@ final class Recipe
         int $prepTimeMinutes,
         array $ingredients,
         array $steps,
+        ?Ulid $coverMediaId = null,
     ): void {
         $this->applyContent($title, $description, $portions, $prepTimeMinutes, $ingredients, $steps);
+        $this->coverMediaId = $coverMediaId;
         $this->status = RecipeStatus::Draft;
     }
 
@@ -217,5 +222,10 @@ final class Recipe
     public function steps(): array
     {
         return $this->steps;
+    }
+
+    public function coverMediaId(): ?Ulid
+    {
+        return $this->coverMediaId;
     }
 }

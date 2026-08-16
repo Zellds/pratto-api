@@ -1,6 +1,8 @@
 <?php
 
+use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
@@ -106,4 +108,25 @@ it('deletes a recipe (soft delete) and it stops being retrievable', function () 
     $this->withHeader('Authorization', "Bearer {$token}")->deleteJson("/api/recipes/{$recipeId}")->assertNoContent();
 
     $this->withHeader('Authorization', "Bearer {$token}")->getJson("/api/recipes/{$recipeId}")->assertStatus(404);
+});
+
+it('creates a recipe with a cover media owned by the user', function () {
+    Storage::fake('media');
+    $token = authenticatedToken($this);
+    $ownerId = EloquentUser::query()->where('username', 'gabriel')->value('id');
+    $cover = anApprovedAvatar($ownerId);
+
+    $response = $this->withToken($token)->postJson('/api/recipes', recipePayload(['cover_media_id' => $cover->id]));
+
+    $response->assertCreated()->assertJsonPath('coverMediaId', $cover->id);
+});
+
+it('rejects a cover media owned by another user', function () {
+    Storage::fake('media');
+    $token = authenticatedToken($this);
+    $strangerCover = anApprovedAvatar(anOwner()->value());
+
+    $response = $this->withToken($token)->postJson('/api/recipes', recipePayload(['cover_media_id' => $strangerCover->id]));
+
+    $response->assertStatus(422);
 });

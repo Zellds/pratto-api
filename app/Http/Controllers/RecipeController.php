@@ -12,6 +12,7 @@ use App\Application\Recipe\UseCases\GetRecipe;
 use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Application\Recipe\UseCases\SearchRecipes;
 use App\Application\Recipe\UseCases\UpdateRecipe;
+use App\Domain\Recipe\CoverMediaNotOwnedException;
 use App\Domain\Recipe\InvalidRecipeStatusTransitionException;
 use App\Domain\Recipe\RecipeNotFoundException;
 use App\Domain\Recipe\RecipeNotOwnedException;
@@ -27,15 +28,20 @@ class RecipeController extends Controller
 {
     public function store(StoreRecipeRequest $request, CreateRecipe $createRecipe): JsonResponse
     {
-        $output = $createRecipe(new CreateRecipeInput(
-            $request->user()->id,
-            $request->string('title')->value(),
-            $request->string('description')->value(),
-            (int) $request->integer('portions'),
-            (int) $request->integer('prep_time_minutes'),
-            $this->ingredientInputs($request),
-            $this->stepInputs($request),
-        ));
+        try {
+            $output = $createRecipe(new CreateRecipeInput(
+                $request->user()->id,
+                $request->string('title')->value(),
+                $request->string('description')->value(),
+                (int) $request->integer('portions'),
+                (int) $request->integer('prep_time_minutes'),
+                $this->ingredientInputs($request),
+                $this->stepInputs($request),
+                $request->input('cover_media_id'),
+            ));
+        } catch (CoverMediaNotOwnedException $exception) {
+            abort(422, $exception->getMessage());
+        }
 
         return (new RecipeResource($output))->response()->setStatusCode(201);
     }
@@ -52,11 +58,14 @@ class RecipeController extends Controller
                 (int) $request->integer('prep_time_minutes'),
                 $this->ingredientInputs($request),
                 $this->stepInputs($request),
+                $request->input('cover_media_id'),
             ));
         } catch (RecipeNotFoundException) {
             abort(404);
         } catch (RecipeNotOwnedException) {
             abort(403);
+        } catch (CoverMediaNotOwnedException $exception) {
+            abort(422, $exception->getMessage());
         }
 
         return new RecipeResource($output);

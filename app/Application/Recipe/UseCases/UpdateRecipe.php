@@ -6,8 +6,10 @@ namespace App\Application\Recipe\UseCases;
 
 use App\Application\Ingredient\DTOs\ResolveIngredientInput;
 use App\Application\Ingredient\UseCases\ResolveIngredient;
+use App\Application\Recipe\Concerns\ValidatesCoverMedia;
 use App\Application\Recipe\DTOs\RecipeOutput;
 use App\Application\Recipe\DTOs\UpdateRecipeInput;
+use App\Domain\Media\Contracts\MediaRepositoryInterface;
 use App\Domain\Recipe\MeasurementUnit;
 use App\Domain\Recipe\RecipeIngredient;
 use App\Domain\Recipe\RecipeNotFoundException;
@@ -17,9 +19,12 @@ use App\Domain\Shared\Ulid;
 
 final readonly class UpdateRecipe
 {
+    use ValidatesCoverMedia;
+
     public function __construct(
         private RecipeRepositoryInterface $recipes,
         private ResolveIngredient $resolveIngredient,
+        private MediaRepositoryInterface $media,
     ) {}
 
     public function __invoke(UpdateRecipeInput $input): RecipeOutput
@@ -30,7 +35,8 @@ final readonly class UpdateRecipe
             throw RecipeNotFoundException::forId(Ulid::fromString($input->recipeId));
         }
 
-        $recipe->assertOwnedBy(Ulid::fromString($input->requesterId));
+        $requesterId = Ulid::fromString($input->requesterId);
+        $recipe->assertOwnedBy($requesterId);
 
         $ingredients = array_map(
             fn ($line) => RecipeIngredient::create(
@@ -47,7 +53,9 @@ final readonly class UpdateRecipe
             $input->steps,
         );
 
-        $recipe->update($input->title, $input->description, $input->portions, $input->prepTimeMinutes, $ingredients, $steps);
+        $coverMediaId = $this->assertCoverUsable($this->media, $input->coverMediaId, $requesterId);
+
+        $recipe->update($input->title, $input->description, $input->portions, $input->prepTimeMinutes, $ingredients, $steps, $coverMediaId);
 
         $this->recipes->save($recipe);
 

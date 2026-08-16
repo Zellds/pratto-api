@@ -22,6 +22,7 @@ final readonly class RecipeOutput
         public string $status,
         public array $ingredients,
         public array $steps,
+        public ?string $coverMediaId,
     ) {}
 
     public static function fromDomain(Recipe $recipe, ?int $requestedPortions = null): self
@@ -51,6 +52,7 @@ final readonly class RecipeOutput
             $recipe->status()->value,
             $ingredients,
             $steps,
+            $recipe->coverMediaId()?->value(),
         );
     }
 }

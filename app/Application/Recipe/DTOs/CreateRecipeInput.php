@@ -18,5 +18,6 @@ final readonly class CreateRecipeInput
         public int $prepTimeMinutes,
         public array $ingredients,
         public array $steps,
+        public ?string $coverMediaId = null,
     ) {}
 }

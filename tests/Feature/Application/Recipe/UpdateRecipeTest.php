@@ -40,3 +40,18 @@ it('rejects an update from someone who is not the owner', function () {
         [new RecipeStepInput(0, 'x')],
     ));
 })->throws(RecipeNotOwnedException::class);
+
+it('updates the cover media, validating ownership', function () {
+    $owner = anOwner();
+    $draft = createADraft($owner->value());
+    $cover = anApprovedAvatar($owner->value());
+
+    $output = app(UpdateRecipe::class)(new UpdateRecipeInput(
+        $draft->id, $owner->value(), 'Bolo atualizado', 'Descrição', 4, 30,
+        [new RecipeIngredientInput(null, 'Farinha', 1.0, 'unidade', 0)],
+        [new RecipeStepInput(0, 'Misture.')],
+        $cover->id,
+    ));
+
+    expect($output->coverMediaId)->toBe($cover->id);
+});
