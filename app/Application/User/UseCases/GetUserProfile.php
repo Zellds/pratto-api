@@ -23,6 +23,7 @@ final readonly class GetUserProfile
             $user->username()->value(),
             $user->displayName()->value(),
             $user->bio(),
+            $user->avatarMediaId()?->value(),
         );
     }
 }

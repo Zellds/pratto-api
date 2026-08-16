@@ -32,6 +32,7 @@ final readonly class RegisterUser
             $user->username()->value(),
             $user->displayName()->value(),
             $user->bio(),
+            $user->avatarMediaId()?->value(),
         );
     }
 }

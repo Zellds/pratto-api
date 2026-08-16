@@ -37,6 +37,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
                 'username' => $user->username()->value(),
                 'display_name' => $user->displayName()->value(),
                 'bio' => $user->bio(),
+                'avatar_media_id' => $user->avatarMediaId()?->value(),
                 'password' => $password,
             ],
         );
@@ -102,6 +103,10 @@ final class EloquentUserRepository implements UserRepositoryInterface
 
         if ($record->bio !== null) {
             $user->updateBio($record->bio);
+        }
+
+        if ($record->avatar_media_id !== null) {
+            $user->updateAvatar(Ulid::fromString($record->avatar_media_id));
         }
 
         return $user;

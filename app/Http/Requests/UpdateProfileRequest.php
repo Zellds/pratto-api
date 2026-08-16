@@ -15,6 +15,7 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'bio' => ['required', 'string', 'max:280'],
+            'avatar_media_id' => ['nullable', 'string', 'exists:media,id'],
         ];
     }
 }

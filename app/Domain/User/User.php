@@ -9,6 +9,8 @@ final class User
 {
     private ?string $bio = null;
 
+    private ?Ulid $avatarMediaId = null;
+
     private function __construct(
         private readonly Ulid $id,
         private readonly Username $username,
@@ -49,5 +51,15 @@ final class User
         }
 
         $this->bio = $trimmed;
+    }
+
+    public function avatarMediaId(): ?Ulid
+    {
+        return $this->avatarMediaId;
+    }
+
+    public function updateAvatar(?Ulid $mediaId): void
+    {
+        $this->avatarMediaId = $mediaId;
     }
 }

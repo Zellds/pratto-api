@@ -17,6 +17,7 @@ class UserProfileResource extends JsonResource
             'username' => $this->resource->username,
             'displayName' => $this->resource->displayName,
             'bio' => $this->resource->bio,
+            'avatarMediaId' => $this->resource->avatarMediaId,
         ];
     }
 }

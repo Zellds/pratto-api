@@ -18,6 +18,7 @@ class EloquentUser extends Authenticatable
         'username',
         'display_name',
         'bio',
+        'avatar_media_id',
         'password',
         'theme',
         'role',

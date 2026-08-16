@@ -31,3 +31,27 @@ it('rejects a bio longer than 280 characters', function () {
 
     $user->updateBio(str_repeat('a', 281));
 })->throws(InvalidArgumentException::class);
+
+it('starts with no avatar', function () {
+    $user = User::register(Ulid::generate(), Username::fromString('gabriel'), DisplayName::fromString('Gabriel'));
+
+    expect($user->avatarMediaId())->toBeNull();
+});
+
+it('updates the avatar media id', function () {
+    $user = User::register(Ulid::generate(), Username::fromString('gabriel'), DisplayName::fromString('Gabriel'));
+    $avatarId = Ulid::generate();
+
+    $user->updateAvatar($avatarId);
+
+    expect($user->avatarMediaId()->equals($avatarId))->toBeTrue();
+});
+
+it('clears the avatar when updated with null', function () {
+    $user = User::register(Ulid::generate(), Username::fromString('gabriel'), DisplayName::fromString('Gabriel'));
+    $user->updateAvatar(Ulid::generate());
+
+    $user->updateAvatar(null);
+
+    expect($user->avatarMediaId())->toBeNull();
+});

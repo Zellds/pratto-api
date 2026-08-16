@@ -9,5 +9,6 @@ final readonly class UserProfileOutput
         public string $username,
         public string $displayName,
         public ?string $bio,
+        public ?string $avatarMediaId,
     ) {}
 }
