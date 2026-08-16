@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
@@ -22,4 +23,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/recipes/{recipe}', [RecipeController::class, 'update']);
     Route::post('/recipes/{recipe}/publish', [RecipeController::class, 'publish']);
     Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy']);
+
+    Route::post('/media', [MediaController::class, 'store']);
+    Route::patch('/media/{media}/focal-point', [MediaController::class, 'focalPoint']);
+
+    Route::middleware('admin')->group(function () {
+        Route::patch('/media/{media}/approve', [MediaController::class, 'approve']);
+        Route::patch('/media/{media}/reject', [MediaController::class, 'reject']);
+    });
 });
