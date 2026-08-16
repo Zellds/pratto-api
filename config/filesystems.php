@@ -60,6 +60,19 @@ return [
             'report' => false,
         ],
 
+        'media' => [
+            'driver' => 's3',
+            'key' => env('MEDIA_STORAGE_KEY'),
+            'secret' => env('MEDIA_STORAGE_SECRET'),
+            'region' => env('MEDIA_STORAGE_REGION', 'garage'),
+            'bucket' => env('MEDIA_STORAGE_BUCKET', 'pratto-media'),
+            'endpoint' => env('MEDIA_STORAGE_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'visibility' => 'private',
+            'throw' => true,
+            'report' => false,
+        ],
+
     ],
 
     /*

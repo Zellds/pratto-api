@@ -26,5 +26,17 @@ services:
       - pratto_pgdata:/var/lib/postgresql/data
       - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
 
+  garage:
+    image: dxflrs/garage:v1.0.1
+    ports:
+      - "3900:3900"
+      - "3901:3901"
+    volumes:
+      - ./docker/garage.toml:/etc/garage.toml
+      - garage_data:/var/lib/garage/data
+      - garage_meta:/var/lib/garage/meta
+
 volumes:
   pratto_pgdata:
+  garage_data:
+  garage_meta:
