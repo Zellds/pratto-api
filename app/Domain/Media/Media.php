@@ -10,6 +10,9 @@ use App\Domain\Shared\Ulid;
 /**
  * Aggregate root for an uploaded image (avatar or recipe cover photo):
  * ownership, storage location, focal point and moderation status.
+ *
+ * @SuppressWarnings("PHPMD.TooManyPublicMethods")
+ * @SuppressWarnings("PHPMD.ExcessiveParameterList")
  */
 final class Media
 {

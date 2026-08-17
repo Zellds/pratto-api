@@ -2,6 +2,9 @@
 
 namespace App\Application\Media\DTOs;
 
+/**
+ * @SuppressWarnings("PHPMD.ExcessiveParameterList")
+ */
 final readonly class MediaOutput
 {
     public function __construct(

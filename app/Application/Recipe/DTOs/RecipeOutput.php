@@ -6,6 +6,9 @@ namespace App\Application\Recipe\DTOs;
 
 use App\Domain\Recipe\Recipe;
 
+/**
+ * @SuppressWarnings("PHPMD.ExcessiveParameterList")
+ */
 final readonly class RecipeOutput
 {
     /**

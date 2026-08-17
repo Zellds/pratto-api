@@ -9,8 +9,11 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
 
-final class ImagePipeline implements ImageProcessorInterface
+final readonly class ImagePipeline implements ImageProcessorInterface
 {
+    // Deliberately untyped: PHP 8.3 typed class constants aren't parseable by
+    // deptrac-shim 1.0.2's bundled php-parser (see rector.php withSkip for
+    // AddTypeToConstRector on this file).
     private const MAX_DIMENSION_PX = 8000;
 
     private const MAX_TOTAL_PIXELS = 40_000_000;
@@ -21,7 +24,7 @@ final class ImagePipeline implements ImageProcessorInterface
 
     private const JPEG_QUALITY = 82;
 
-    public function __construct(private readonly ImageManager $manager) {}
+    public function __construct(private ImageManager $manager) {}
 
     public function process(string $sourcePath, string $storageKey, FocalPoint $focalPoint): array
     {

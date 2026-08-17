@@ -10,6 +10,7 @@ use InvalidArgumentException;
  * ingredients, steps and its publication status.
  *
  * @SuppressWarnings("PHPMD.TooManyPublicMethods")
+ * @SuppressWarnings("PHPMD.ExcessiveParameterList")
  */
 final class Recipe
 {
