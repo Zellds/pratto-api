@@ -44,13 +44,36 @@ it('rejects an update from someone who is not the owner', function () {
 it('updates the cover media, validating ownership', function () {
     $owner = anOwner();
     $draft = createADraft($owner->value());
-    $cover = anApprovedAvatar($owner->value());
+    $cover = aPendingRecipePhoto($owner->value());
 
     $output = app(UpdateRecipe::class)(new UpdateRecipeInput(
         $draft->id, $owner->value(), 'Bolo atualizado', 'Descrição', 4, 30,
         [new RecipeIngredientInput(null, 'Farinha', 1.0, 'unidade', 0)],
         [new RecipeStepInput(0, 'Misture.')],
         $cover->id,
+        true,
+    ));
+
+    expect($output->coverMediaId)->toBe($cover->id);
+});
+
+it('leaves the cover media untouched when the field is not provided', function () {
+    $owner = anOwner();
+    $draft = createADraft($owner->value());
+    $cover = aPendingRecipePhoto($owner->value());
+
+    app(UpdateRecipe::class)(new UpdateRecipeInput(
+        $draft->id, $owner->value(), 'Bolo com capa', 'Descrição', 4, 30,
+        [new RecipeIngredientInput(null, 'Farinha', 1.0, 'unidade', 0)],
+        [new RecipeStepInput(0, 'Misture.')],
+        $cover->id,
+        true,
+    ));
+
+    $output = app(UpdateRecipe::class)(new UpdateRecipeInput(
+        $draft->id, $owner->value(), 'Bolo atualizado de novo', 'Nova descrição', 4, 30,
+        [new RecipeIngredientInput(null, 'Farinha', 1.0, 'unidade', 0)],
+        [new RecipeStepInput(0, 'Misture.')],
     ));
 
     expect($output->coverMediaId)->toBe($cover->id);

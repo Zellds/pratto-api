@@ -4,6 +4,7 @@ namespace App\Application\User\UseCases;
 
 use App\Application\User\DTOs\UserProfileOutput;
 use App\Domain\Media\Contracts\MediaRepositoryInterface;
+use App\Domain\Media\Enums\MediaKind;
 use App\Domain\Shared\Ulid;
 use App\Domain\User\Exceptions\AvatarMediaNotOwnedException;
 use App\Domain\User\Username;
@@ -52,6 +53,10 @@ final readonly class UpdateProfile
         $record = $this->media->findById($mediaId);
 
         if ($record === null || ! $record->ownerId()->equals($ownerId)) {
+            throw AvatarMediaNotOwnedException::forMedia($mediaId);
+        }
+
+        if ($record->kind() !== MediaKind::Avatar) {
             throw AvatarMediaNotOwnedException::forMedia($mediaId);
         }
 

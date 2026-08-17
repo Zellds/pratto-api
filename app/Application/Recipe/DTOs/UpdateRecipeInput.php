@@ -4,6 +4,9 @@
 
 namespace App\Application\Recipe\DTOs;
 
+/**
+ * @SuppressWarnings("PHPMD.ExcessiveParameterList")
+ */
 final readonly class UpdateRecipeInput
 {
     /**
@@ -20,5 +23,6 @@ final readonly class UpdateRecipeInput
         public array $ingredients,
         public array $steps,
         public ?string $coverMediaId = null,
+        public bool $coverMediaIdProvided = false,
     ) {}
 }

@@ -53,7 +53,9 @@ final readonly class UpdateRecipe
             $input->steps,
         );
 
-        $coverMediaId = $this->assertCoverUsable($this->media, $input->coverMediaId, $requesterId);
+        $coverMediaId = $input->coverMediaIdProvided
+            ? $this->assertCoverUsable($this->media, $input->coverMediaId, $requesterId)
+            : $recipe->coverMediaId();
 
         $recipe->update($input->title, $input->description, $input->portions, $input->prepTimeMinutes, $ingredients, $steps, $coverMediaId);
 

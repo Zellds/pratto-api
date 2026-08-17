@@ -114,7 +114,7 @@ it('creates a recipe with a cover media owned by the user', function () {
     Storage::fake('media');
     $token = authenticatedToken($this);
     $ownerId = EloquentUser::query()->where('username', 'gabriel')->value('id');
-    $cover = anApprovedAvatar($ownerId);
+    $cover = aPendingRecipePhoto($ownerId);
 
     $response = $this->withToken($token)->postJson('/api/recipes', recipePayload(['cover_media_id' => $cover->id]));
 
@@ -124,9 +124,32 @@ it('creates a recipe with a cover media owned by the user', function () {
 it('rejects a cover media owned by another user', function () {
     Storage::fake('media');
     $token = authenticatedToken($this);
-    $strangerCover = anApprovedAvatar(anOwner()->value());
+    $strangerCover = aPendingRecipePhoto(anOwner()->value());
 
     $response = $this->withToken($token)->postJson('/api/recipes', recipePayload(['cover_media_id' => $strangerCover->id]));
 
     $response->assertStatus(422);
+});
+
+it('rejects an avatar-kind media used as a recipe cover', function () {
+    Storage::fake('media');
+    $token = authenticatedToken($this);
+    $ownerId = EloquentUser::query()->where('username', 'gabriel')->value('id');
+    $avatar = anApprovedAvatar($ownerId);
+
+    $response = $this->withToken($token)->postJson('/api/recipes', recipePayload(['cover_media_id' => $avatar->id]));
+
+    $response->assertStatus(422);
+});
+
+it('keeps the cover media when updating a recipe without resending cover_media_id', function () {
+    Storage::fake('media');
+    $token = authenticatedToken($this);
+    $ownerId = EloquentUser::query()->where('username', 'gabriel')->value('id');
+    $cover = aPendingRecipePhoto($ownerId);
+    $recipeId = $this->withToken($token)->postJson('/api/recipes', recipePayload(['cover_media_id' => $cover->id]))->json('id');
+
+    $response = $this->withToken($token)->patchJson("/api/recipes/{$recipeId}", recipePayload(['title' => 'Bolo atualizado']));
+
+    $response->assertOk()->assertJsonPath('coverMediaId', $cover->id);
 });

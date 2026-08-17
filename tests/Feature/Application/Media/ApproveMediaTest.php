@@ -4,7 +4,10 @@
 
 use App\Application\Media\UseCases\ApproveMedia;
 use App\Domain\Media\Exceptions\MediaNotFoundException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\Uid\Ulid;
+
+uses(RefreshDatabase::class);
 
 it('approves pending media', function () {
     $owner = anOwner();

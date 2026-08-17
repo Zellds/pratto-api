@@ -4,7 +4,10 @@
 
 use App\Application\Media\DTOs\UploadMediaInput;
 use App\Application\Media\UseCases\UploadMedia;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+
+uses(RefreshDatabase::class);
 
 it('uploads an avatar already approved, with signed urls', function () {
     Storage::fake('media');

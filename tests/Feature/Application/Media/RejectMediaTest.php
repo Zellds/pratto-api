@@ -3,6 +3,9 @@
 // tests/Feature/Application/Media/RejectMediaTest.php
 
 use App\Application\Media\UseCases\RejectMedia;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 it('rejects media with a reason', function () {
     $owner = anOwner();

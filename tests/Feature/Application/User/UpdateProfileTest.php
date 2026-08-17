@@ -36,6 +36,14 @@ it('leaves the avatar untouched when the field is not provided', function () {
     expect($profile->avatarMediaId)->toBe($avatar->id);
 });
 
+it('rejects a recipe_photo-kind media used as an avatar', function () {
+    $owner = anOwner();
+    $username = EloquentUser::query()->find($owner->value())->username;
+    $recipePhoto = aPendingRecipePhoto($owner->value());
+
+    app(UpdateProfile::class)($username, 'Minha bio', $recipePhoto->id, true);
+})->throws(AvatarMediaNotOwnedException::class);
+
 it('clears the avatar when explicitly set to null', function () {
     $owner = anOwner();
     $username = EloquentUser::query()->find($owner->value())->username;

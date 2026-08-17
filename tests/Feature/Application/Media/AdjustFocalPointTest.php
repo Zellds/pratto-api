@@ -4,6 +4,9 @@
 
 use App\Application\Media\UseCases\AdjustFocalPoint;
 use App\Domain\Media\Exceptions\MediaNotOwnedException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 it('updates the focal point and re-crops the thumbnail', function () {
     $owner = anOwner();

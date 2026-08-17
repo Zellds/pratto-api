@@ -59,6 +59,7 @@ class RecipeController extends Controller
                 $this->ingredientInputs($request),
                 $this->stepInputs($request),
                 $request->input('cover_media_id'),
+                $request->has('cover_media_id'),
             ));
         } catch (RecipeNotFoundException) {
             abort(404);
