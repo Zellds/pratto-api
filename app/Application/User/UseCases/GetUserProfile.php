@@ -3,8 +3,8 @@
 namespace App\Application\User\UseCases;
 
 use App\Application\User\DTOs\UserProfileOutput;
+use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Domain\User\Username;
-use App\Domain\User\UserRepositoryInterface;
 
 final readonly class GetUserProfile
 {

@@ -2,7 +2,7 @@
 
 use App\Application\Ingredient\DTOs\ResolveIngredientInput;
 use App\Application\Ingredient\UseCases\ResolveIngredient;
-use App\Domain\Ingredient\IngredientStatus;
+use App\Domain\Ingredient\Enums\IngredientStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\Uid\Ulid;
 

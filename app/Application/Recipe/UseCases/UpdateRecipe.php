@@ -10,10 +10,10 @@ use App\Application\Recipe\Concerns\ValidatesCoverMedia;
 use App\Application\Recipe\DTOs\RecipeOutput;
 use App\Application\Recipe\DTOs\UpdateRecipeInput;
 use App\Domain\Media\Contracts\MediaRepositoryInterface;
-use App\Domain\Recipe\MeasurementUnit;
+use App\Domain\Recipe\Contracts\RecipeRepositoryInterface;
+use App\Domain\Recipe\Enums\MeasurementUnit;
+use App\Domain\Recipe\Exceptions\RecipeNotFoundException;
 use App\Domain\Recipe\RecipeIngredient;
-use App\Domain\Recipe\RecipeNotFoundException;
-use App\Domain\Recipe\RecipeRepositoryInterface;
 use App\Domain\Recipe\RecipeStep;
 use App\Domain\Shared\Ulid;
 

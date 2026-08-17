@@ -10,7 +10,7 @@ use App\Application\Recipe\UseCases\GetRecipe;
 use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
-use App\Domain\Recipe\RecipeNotFoundException;
+use App\Domain\Recipe\Exceptions\RecipeNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

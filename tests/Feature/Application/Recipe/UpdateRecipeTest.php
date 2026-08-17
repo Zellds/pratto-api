@@ -9,7 +9,7 @@ use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Application\Recipe\UseCases\UpdateRecipe;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
-use App\Domain\Recipe\RecipeNotOwnedException;
+use App\Domain\Recipe\Exceptions\RecipeNotOwnedException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

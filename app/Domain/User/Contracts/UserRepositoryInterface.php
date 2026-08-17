@@ -1,8 +1,11 @@
 <?php
 
-namespace App\Domain\User;
+namespace App\Domain\User\Contracts;
 
 use App\Domain\Shared\Ulid;
+use App\Domain\User\Exceptions\DuplicateUsernameException;
+use App\Domain\User\User;
+use App\Domain\User\Username;
 
 interface UserRepositoryInterface
 {

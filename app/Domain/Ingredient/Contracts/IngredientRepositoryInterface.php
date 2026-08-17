@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Domain\Ingredient;
+namespace App\Domain\Ingredient\Contracts;
 
+use App\Domain\Ingredient\Ingredient;
 use App\Domain\Shared\Ulid;
 
 interface IngredientRepositoryInterface

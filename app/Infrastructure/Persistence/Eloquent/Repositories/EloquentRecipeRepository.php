@@ -2,11 +2,11 @@
 
 namespace App\Infrastructure\Persistence\Eloquent\Repositories;
 
-use App\Domain\Recipe\MeasurementUnit;
+use App\Domain\Recipe\Contracts\RecipeRepositoryInterface;
+use App\Domain\Recipe\Enums\MeasurementUnit;
+use App\Domain\Recipe\Enums\RecipeStatus;
 use App\Domain\Recipe\Recipe;
 use App\Domain\Recipe\RecipeIngredient;
-use App\Domain\Recipe\RecipeRepositoryInterface;
-use App\Domain\Recipe\RecipeStatus;
 use App\Domain\Recipe\RecipeStep;
 use App\Domain\Shared\Ulid;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentRecipe;

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Domain\User;
+namespace App\Domain\User\Exceptions;
 
+use App\Domain\User\Username;
 use RuntimeException;
 
 final class DuplicateUsernameException extends RuntimeException

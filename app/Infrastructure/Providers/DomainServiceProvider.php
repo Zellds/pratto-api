@@ -2,13 +2,13 @@
 
 namespace App\Infrastructure\Providers;
 
-use App\Domain\Ingredient\IngredientRepositoryInterface;
+use App\Domain\Ingredient\Contracts\IngredientRepositoryInterface;
 use App\Domain\Media\Contracts\ImageProcessorInterface;
 use App\Domain\Media\Contracts\MediaRepositoryInterface;
 use App\Domain\Media\Contracts\MediaUrlSignerInterface;
-use App\Domain\Recipe\RecipeRepositoryInterface;
-use App\Domain\User\AccessTokenIssuerInterface;
-use App\Domain\User\UserRepositoryInterface;
+use App\Domain\Recipe\Contracts\RecipeRepositoryInterface;
+use App\Domain\User\Contracts\AccessTokenIssuerInterface;
+use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Infrastructure\Auth\SanctumAccessTokenIssuer;
 use App\Infrastructure\Media\ImagePipeline;
 use App\Infrastructure\Media\TemporaryMediaUrlSigner;

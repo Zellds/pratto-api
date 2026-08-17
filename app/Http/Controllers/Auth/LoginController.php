@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Application\User\DTOs\LoginUserInput;
 use App\Application\User\UseCases\LoginUser;
-use App\Domain\User\InvalidCredentialsException;
+use App\Domain\User\Exceptions\InvalidCredentialsException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

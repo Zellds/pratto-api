@@ -4,10 +4,10 @@ namespace App\Application\User\UseCases;
 
 use App\Application\User\DTOs\LoginUserInput;
 use App\Application\User\DTOs\LoginUserOutput;
-use App\Domain\User\AccessTokenIssuerInterface;
-use App\Domain\User\InvalidCredentialsException;
+use App\Domain\User\Contracts\AccessTokenIssuerInterface;
+use App\Domain\User\Contracts\UserRepositoryInterface;
+use App\Domain\User\Exceptions\InvalidCredentialsException;
 use App\Domain\User\Username;
-use App\Domain\User\UserRepositoryInterface;
 use InvalidArgumentException;
 
 final readonly class LoginUser

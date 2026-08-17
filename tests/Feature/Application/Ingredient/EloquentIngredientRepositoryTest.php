@@ -1,9 +1,9 @@
 <?php
 
+use App\Domain\Ingredient\Contracts\IngredientRepositoryInterface;
+use App\Domain\Ingredient\Enums\IngredientStatus;
 use App\Domain\Ingredient\Ingredient;
 use App\Domain\Ingredient\IngredientName;
-use App\Domain\Ingredient\IngredientRepositoryInterface;
-use App\Domain\Ingredient\IngredientStatus;
 use App\Domain\Shared\Ulid;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

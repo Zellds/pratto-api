@@ -1,11 +1,11 @@
 <?php
 
-use App\Domain\Recipe\InvalidRecipeStatusTransitionException;
-use App\Domain\Recipe\MeasurementUnit;
+use App\Domain\Recipe\Enums\MeasurementUnit;
+use App\Domain\Recipe\Enums\RecipeStatus;
+use App\Domain\Recipe\Exceptions\InvalidRecipeStatusTransitionException;
+use App\Domain\Recipe\Exceptions\RecipeNotOwnedException;
 use App\Domain\Recipe\Recipe;
 use App\Domain\Recipe\RecipeIngredient;
-use App\Domain\Recipe\RecipeNotOwnedException;
-use App\Domain\Recipe\RecipeStatus;
 use App\Domain\Shared\Ulid;
 
 it('is created as draft', function () {

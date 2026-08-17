@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Auth;
 
 use App\Domain\Shared\Ulid;
-use App\Domain\User\AccessTokenIssuerInterface;
+use App\Domain\User\Contracts\AccessTokenIssuerInterface;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser;
 
 final class SanctumAccessTokenIssuer implements AccessTokenIssuerInterface

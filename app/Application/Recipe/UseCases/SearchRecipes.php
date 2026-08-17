@@ -5,7 +5,7 @@
 namespace App\Application\Recipe\UseCases;
 
 use App\Application\Recipe\DTOs\RecipeOutput;
-use App\Domain\Recipe\RecipeRepositoryInterface;
+use App\Domain\Recipe\Contracts\RecipeRepositoryInterface;
 use App\Domain\Shared\Ulid;
 
 final readonly class SearchRecipes

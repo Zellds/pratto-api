@@ -2,6 +2,9 @@
 
 namespace App\Domain\Recipe;
 
+use App\Domain\Recipe\Enums\RecipeStatus;
+use App\Domain\Recipe\Exceptions\InvalidRecipeStatusTransitionException;
+use App\Domain\Recipe\Exceptions\RecipeNotOwnedException;
 use App\Domain\Shared\Ulid;
 use InvalidArgumentException;
 

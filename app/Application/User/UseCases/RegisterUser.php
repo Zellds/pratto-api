@@ -5,11 +5,11 @@ namespace App\Application\User\UseCases;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\DTOs\UserProfileOutput;
 use App\Domain\Shared\Ulid;
+use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Domain\User\DisplayName;
-use App\Domain\User\DuplicateUsernameException;
+use App\Domain\User\Exceptions\DuplicateUsernameException;
 use App\Domain\User\User;
 use App\Domain\User\Username;
-use App\Domain\User\UserRepositoryInterface;
 
 final readonly class RegisterUser
 {

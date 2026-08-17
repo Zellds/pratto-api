@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Domain\Recipe;
+namespace App\Domain\Recipe\Contracts;
 
+use App\Domain\Recipe\Recipe;
 use App\Domain\Shared\Ulid;
 
 interface RecipeRepositoryInterface

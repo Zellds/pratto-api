@@ -2,6 +2,7 @@
 
 namespace App\Domain\Recipe;
 
+use App\Domain\Recipe\Enums\MeasurementUnit;
 use App\Domain\Shared\Ulid;
 use InvalidArgumentException;
 

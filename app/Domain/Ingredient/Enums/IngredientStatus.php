@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Ingredient;
+namespace App\Domain\Ingredient\Enums;
 
 enum IngredientStatus: string
 {

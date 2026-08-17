@@ -3,7 +3,7 @@
 namespace App\Application\Ingredient\UseCases;
 
 use App\Application\Ingredient\DTOs\IngredientOutput;
-use App\Domain\Ingredient\IngredientRepositoryInterface;
+use App\Domain\Ingredient\Contracts\IngredientRepositoryInterface;
 
 final readonly class SearchIngredients
 {

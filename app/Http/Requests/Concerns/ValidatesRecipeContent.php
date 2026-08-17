@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Concerns;
 
-use App\Domain\Recipe\MeasurementUnit;
+use App\Domain\Recipe\Enums\MeasurementUnit;
 use Illuminate\Validation\Rule;
 
 trait ValidatesRecipeContent

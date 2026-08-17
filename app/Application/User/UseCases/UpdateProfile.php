@@ -6,9 +6,9 @@ use App\Application\User\DTOs\UserProfileOutput;
 use App\Domain\Media\Contracts\MediaRepositoryInterface;
 use App\Domain\Media\Enums\MediaKind;
 use App\Domain\Shared\Ulid;
+use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Domain\User\Exceptions\AvatarMediaNotOwnedException;
 use App\Domain\User\Username;
-use App\Domain\User\UserRepositoryInterface;
 use RuntimeException;
 
 final readonly class UpdateProfile

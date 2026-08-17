@@ -3,9 +3,9 @@
 namespace App\Application\Ingredient\UseCases;
 
 use App\Application\Ingredient\DTOs\ResolveIngredientInput;
+use App\Domain\Ingredient\Contracts\IngredientRepositoryInterface;
 use App\Domain\Ingredient\Ingredient;
 use App\Domain\Ingredient\IngredientName;
-use App\Domain\Ingredient\IngredientRepositoryInterface;
 use App\Domain\Shared\Ulid;
 use InvalidArgumentException;
 use RuntimeException;

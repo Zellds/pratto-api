@@ -2,7 +2,7 @@
 
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
-use App\Domain\User\DuplicateUsernameException;
+use App\Domain\User\Exceptions\DuplicateUsernameException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

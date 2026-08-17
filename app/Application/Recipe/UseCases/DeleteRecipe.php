@@ -4,8 +4,8 @@
 
 namespace App\Application\Recipe\UseCases;
 
-use App\Domain\Recipe\RecipeNotFoundException;
-use App\Domain\Recipe\RecipeRepositoryInterface;
+use App\Domain\Recipe\Contracts\RecipeRepositoryInterface;
+use App\Domain\Recipe\Exceptions\RecipeNotFoundException;
 use App\Domain\Shared\Ulid;
 
 final readonly class DeleteRecipe

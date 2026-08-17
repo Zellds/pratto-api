@@ -2,6 +2,7 @@
 
 namespace App\Domain\Ingredient;
 
+use App\Domain\Ingredient\Enums\IngredientStatus;
 use App\Domain\Shared\Ulid;
 
 final readonly class Ingredient

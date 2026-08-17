@@ -9,8 +9,8 @@ use App\Application\Recipe\UseCases\CreateRecipe;
 use App\Application\Recipe\UseCases\DeleteRecipe;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
-use App\Domain\Recipe\RecipeNotFoundException;
-use App\Domain\Recipe\RecipeRepositoryInterface;
+use App\Domain\Recipe\Contracts\RecipeRepositoryInterface;
+use App\Domain\Recipe\Exceptions\RecipeNotFoundException;
 use App\Domain\Shared\Ulid;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

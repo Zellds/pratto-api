@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Domain\Recipe;
+namespace App\Domain\Recipe\Exceptions;
 
+use App\Domain\Recipe\Enums\RecipeStatus;
 use RuntimeException;
 
 final class InvalidRecipeStatusTransitionException extends RuntimeException

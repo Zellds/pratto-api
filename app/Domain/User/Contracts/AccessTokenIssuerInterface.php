@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\User;
+namespace App\Domain\User\Contracts;
 
 use App\Domain\Shared\Ulid;
 

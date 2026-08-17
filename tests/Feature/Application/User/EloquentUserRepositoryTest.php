@@ -4,7 +4,7 @@
 
 use App\Domain\Shared\Ulid;
 use App\Domain\User\DisplayName;
-use App\Domain\User\DuplicateUsernameException;
+use App\Domain\User\Exceptions\DuplicateUsernameException;
 use App\Domain\User\User;
 use App\Domain\User\Username;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;

@@ -12,7 +12,7 @@ use App\Application\Recipe\DTOs\RecipeStepInput;
 use App\Application\Recipe\UseCases\CreateRecipe;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
-use App\Domain\Recipe\MeasurementUnit;
+use App\Domain\Recipe\Enums\MeasurementUnit;
 use App\Domain\Recipe\RecipeIngredient;
 use App\Domain\Recipe\RecipeStep;
 use App\Domain\Shared\Ulid;

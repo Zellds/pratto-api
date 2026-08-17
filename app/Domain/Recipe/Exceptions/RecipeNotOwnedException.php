@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Recipe;
+namespace App\Domain\Recipe\Exceptions;
 
 use App\Domain\Shared\Ulid;
 use RuntimeException;

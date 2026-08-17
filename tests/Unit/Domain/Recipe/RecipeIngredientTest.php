@@ -1,6 +1,6 @@
 <?php
 
-use App\Domain\Recipe\MeasurementUnit;
+use App\Domain\Recipe\Enums\MeasurementUnit;
 use App\Domain\Recipe\RecipeIngredient;
 use App\Domain\Shared\Ulid;
 
