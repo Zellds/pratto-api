@@ -26,6 +26,8 @@ final readonly class RecipeOutput
         public array $ingredients,
         public array $steps,
         public ?string $coverMediaId,
+        public ?float $averageRating = null,
+        public int $ratingsCount = 0,
     ) {}
 
     public static function fromDomain(Recipe $recipe, ?int $requestedPortions = null): self
@@ -56,6 +58,24 @@ final readonly class RecipeOutput
             $ingredients,
             $steps,
             $recipe->coverMediaId()?->value(),
+        );
+    }
+
+    public function withRatingAggregate(?float $averageRating, int $ratingsCount): self
+    {
+        return new self(
+            $this->id,
+            $this->ownerId,
+            $this->title,
+            $this->description,
+            $this->portions,
+            $this->prepTimeMinutes,
+            $this->status,
+            $this->ingredients,
+            $this->steps,
+            $this->coverMediaId,
+            $averageRating,
+            $ratingsCount,
         );
     }
 }

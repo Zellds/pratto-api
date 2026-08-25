@@ -5,13 +5,17 @@
 namespace App\Application\Recipe\UseCases;
 
 use App\Application\Recipe\DTOs\RecipeOutput;
+use App\Domain\Rating\Contracts\RatingRepositoryInterface;
 use App\Domain\Recipe\Contracts\RecipeRepositoryInterface;
 use App\Domain\Recipe\Exceptions\RecipeNotFoundException;
 use App\Domain\Shared\Ulid;
 
 final readonly class GetRecipe
 {
-    public function __construct(private RecipeRepositoryInterface $recipes) {}
+    public function __construct(
+        private RecipeRepositoryInterface $recipes,
+        private RatingRepositoryInterface $ratings,
+    ) {}
 
     public function __invoke(string $recipeId, ?string $viewerId, ?int $requestedPortions): RecipeOutput
     {
@@ -22,6 +26,9 @@ final readonly class GetRecipe
             throw RecipeNotFoundException::forId(Ulid::fromString($recipeId));
         }
 
-        return RecipeOutput::fromDomain($recipe, $requestedPortions);
+        $aggregate = $this->ratings->averageAndCountFor($recipe->id());
+
+        return RecipeOutput::fromDomain($recipe, $requestedPortions)
+            ->withRatingAggregate($aggregate['average'], $aggregate['count']);
     }
 }

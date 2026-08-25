@@ -2,6 +2,7 @@
 
 // tests/Feature/Application/Recipe/GetRecipeTest.php
 
+use App\Application\Rating\UseCases\RateRecipe;
 use App\Application\Recipe\DTOs\CreateRecipeInput;
 use App\Application\Recipe\DTOs\RecipeIngredientInput;
 use App\Application\Recipe\DTOs\RecipeStepInput;
@@ -52,4 +53,29 @@ it('lets the owner see their own draft', function () {
     $output = app(GetRecipe::class)($recipe->id, $owner->id, null);
 
     expect($output->status)->toBe('draft');
+});
+
+it('includes the average rating and count when there are ratings', function () {
+    $owner = anOwner();
+    $draft = createADraft($owner->value());
+    app(PublishRecipe::class)($draft->id, $owner->value());
+
+    app(RateRecipe::class)($draft->id, anOwner()->value(), 4.0);
+    app(RateRecipe::class)($draft->id, anOwner()->value(), 5.0);
+
+    $output = app(GetRecipe::class)($draft->id, null, null);
+
+    expect($output->averageRating)->toBe(4.5)
+        ->and($output->ratingsCount)->toBe(2);
+});
+
+it('returns a null average and zero count when there are no ratings', function () {
+    $owner = anOwner();
+    $draft = createADraft($owner->value());
+    app(PublishRecipe::class)($draft->id, $owner->value());
+
+    $output = app(GetRecipe::class)($draft->id, null, null);
+
+    expect($output->averageRating)->toBeNull()
+        ->and($output->ratingsCount)->toBe(0);
 });

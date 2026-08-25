@@ -1,5 +1,7 @@
 <?php
 
+use App\Application\Rating\UseCases\RateRecipe;
+use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -152,4 +154,22 @@ it('keeps the cover media when updating a recipe without resending cover_media_i
     $response = $this->withToken($token)->patchJson("/api/recipes/{$recipeId}", recipePayload(['title' => 'Bolo atualizado']));
 
     $response->assertOk()->assertJsonPath('coverMediaId', $cover->id);
+});
+
+it('exposes averageRating and ratingsCount on the recipe response', function () {
+    $token = authenticatedToken($this);
+    $ownerId = EloquentUser::query()->where('username', 'gabriel')->value('id');
+    $draft = createADraft($ownerId);
+    app(PublishRecipe::class)($draft->id, $ownerId);
+    app(RateRecipe::class)($draft->id, anOwner()->value(), 4.0);
+
+    $response = $this->withToken($token)->getJson("/api/recipes/{$draft->id}");
+
+    // averageRating is 4.0 (a float) at the DTO level; PHP's json_encode collapses
+    // whole-number floats to ints on the wire (no JSON_PRESERVE_ZERO_FRACTION), so the
+    // decoded JSON value is int 4 — matching the pre-existing convention for the
+    // 'ingredients.0.quantity' assertion above in this same file.
+    $response->assertOk()
+        ->assertJsonPath('averageRating', 4)
+        ->assertJsonPath('ratingsCount', 1);
 });
