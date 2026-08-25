@@ -11,13 +11,18 @@ use Illuminate\Http\Request;
 
 class UserProfileController extends Controller
 {
-    public function show(Request $request, GetUserProfile $getUserProfile): UserProfileResource
+    public function show(Request $request, string $username, GetUserProfile $getUserProfile): UserProfileResource
     {
-        $profile = $getUserProfile($request->user()->username);
+        $profile = $getUserProfile($username);
 
         abort_if($profile === null, 404);
 
         return new UserProfileResource($profile);
+    }
+
+    public function me(Request $request, GetUserProfile $getUserProfile): UserProfileResource
+    {
+        return $this->show($request, $request->user()->username, $getUserProfile);
     }
 
     public function update(UpdateProfileRequest $request, UpdateProfile $updateProfile): UserProfileResource

@@ -19,10 +19,11 @@ Route::get('/ingredients', [IngredientController::class, 'index']);
 Route::get('/recipes', [RecipeController::class, 'index']);
 Route::get('/recipes/{recipe}', [RecipeController::class, 'show']);
 Route::get('/recipes/{recipe}/comments', [CommentController::class, 'index']);
+Route::get('/users/{username}', [UserProfileController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', LogoutController::class);
-    Route::get('/me', [UserProfileController::class, 'show']);
+    Route::get('/me', [UserProfileController::class, 'me']);
     Route::patch('/me', [UserProfileController::class, 'update']);
     Route::post('/recipes', [RecipeController::class, 'store']);
     Route::patch('/recipes/{recipe}', [RecipeController::class, 'update']);

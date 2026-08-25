@@ -18,6 +18,8 @@ class UserProfileResource extends JsonResource
             'displayName' => $this->resource->displayName,
             'bio' => $this->resource->bio,
             'avatarMediaId' => $this->resource->avatarMediaId,
+            'followersCount' => $this->resource->followersCount,
+            'followingCount' => $this->resource->followingCount,
         ];
     }
 }
