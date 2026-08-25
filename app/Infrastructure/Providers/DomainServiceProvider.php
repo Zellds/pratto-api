@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Providers;
 
 use App\Domain\Comment\Contracts\CommentRepositoryInterface;
+use App\Domain\Follow\Contracts\FollowRepositoryInterface;
 use App\Domain\Ingredient\Contracts\IngredientRepositoryInterface;
 use App\Domain\Media\Contracts\ImageProcessorInterface;
 use App\Domain\Media\Contracts\MediaRepositoryInterface;
@@ -15,6 +16,7 @@ use App\Infrastructure\Auth\SanctumAccessTokenIssuer;
 use App\Infrastructure\Media\ImagePipeline;
 use App\Infrastructure\Media\TemporaryMediaUrlSigner;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentCommentRepository;
+use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentFollowRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentIngredientRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentMediaRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentRatingRepository;
@@ -35,6 +37,7 @@ final class DomainServiceProvider extends ServiceProvider
         $this->app->bind(MediaRepositoryInterface::class, EloquentMediaRepository::class);
         $this->app->bind(RatingRepositoryInterface::class, EloquentRatingRepository::class);
         $this->app->bind(CommentRepositoryInterface::class, EloquentCommentRepository::class);
+        $this->app->bind(FollowRepositoryInterface::class, EloquentFollowRepository::class);
         $this->app->singleton(ImageManager::class, static fn () => ImageManager::gd());
         $this->app->bind(ImageProcessorInterface::class, ImagePipeline::class);
         $this->app->bind(MediaUrlSignerInterface::class, TemporaryMediaUrlSigner::class);

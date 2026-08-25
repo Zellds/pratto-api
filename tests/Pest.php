@@ -1,5 +1,6 @@
 <?php
 
+use App\Application\Follow\UseCases\FollowUser;
 use App\Application\Ingredient\DTOs\ResolveIngredientInput;
 use App\Application\Ingredient\UseCases\ResolveIngredient;
 use App\Application\Media\DTOs\MediaOutput;
@@ -180,4 +181,11 @@ function createAPendingReviewRecipe(string $ownerId): RecipeOutput
     $draft = createADraft($ownerId);
 
     return app(PublishRecipe::class)($draft->id, $ownerId);
+}
+
+function aFollow(string $followerId, string $followeeId): void
+{
+    $followeeUsername = EloquentUser::query()->whereKey($followeeId)->value('username');
+
+    app(FollowUser::class)($followerId, $followeeUsername);
 }
