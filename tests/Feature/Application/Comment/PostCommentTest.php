@@ -5,6 +5,7 @@
 use App\Application\Comment\UseCases\PostComment;
 use App\Domain\Recipe\Exceptions\RecipeNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\Uid\Ulid;
 
 uses(RefreshDatabase::class);
 
@@ -20,5 +21,5 @@ it('posts a comment on a visible recipe', function () {
 });
 
 it('throws when the recipe does not exist or is not visible', function () {
-    app(PostComment::class)((string) new Symfony\Component\Uid\Ulid, anOwner()->value(), 'Oi.');
+    app(PostComment::class)((string) new Ulid, anOwner()->value(), 'Oi.');
 })->throws(RecipeNotFoundException::class);

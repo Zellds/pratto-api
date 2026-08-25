@@ -6,6 +6,7 @@ use App\Application\Comment\UseCases\ListComments;
 use App\Application\Comment\UseCases\PostComment;
 use App\Domain\Recipe\Exceptions\RecipeNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\Uid\Ulid;
 
 uses(RefreshDatabase::class);
 
@@ -21,5 +22,5 @@ it('lists comments for a recipe', function () {
 });
 
 it('throws when the recipe does not exist', function () {
-    app(ListComments::class)((string) new Symfony\Component\Uid\Ulid, 1, 20);
+    app(ListComments::class)((string) new Ulid, 1, 20);
 })->throws(RecipeNotFoundException::class);

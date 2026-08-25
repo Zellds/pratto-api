@@ -7,6 +7,7 @@ use App\Application\Comment\UseCases\PostComment;
 use App\Domain\Comment\Exceptions\CommentNotFoundException;
 use App\Domain\Comment\Exceptions\CommentNotOwnedException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\Uid\Ulid;
 
 uses(RefreshDatabase::class);
 
@@ -23,7 +24,7 @@ it('edits a comment owned by the requester', function () {
 });
 
 it('throws when the comment does not exist', function () {
-    app(EditComment::class)((string) new Symfony\Component\Uid\Ulid, anOwner()->value(), 'Novo.');
+    app(EditComment::class)((string) new Ulid, anOwner()->value(), 'Novo.');
 })->throws(CommentNotFoundException::class);
 
 it('throws when a non-author tries to edit', function () {

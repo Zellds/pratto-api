@@ -7,6 +7,7 @@ use App\Domain\Rating\Rating;
 use App\Domain\Rating\Score;
 use App\Domain\Shared\Ulid;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentRating;
+use Illuminate\Support\Facades\DB;
 
 final class EloquentRatingRepository implements RatingRepositoryInterface
 {
@@ -34,14 +35,23 @@ final class EloquentRatingRepository implements RatingRepositoryInterface
 
     public function averageAndCountFor(Ulid $recipeId): array
     {
-        $row = EloquentRating::query()
+        // Uses the query builder (DB::table), not the EloquentRating model,
+        // because the aggregate columns below (average, count) don't exist
+        // as real model attributes — PHPStan/Larastan would flag them as
+        // undefined properties on EloquentRating. stdClass rows from the
+        // query builder don't have that restriction.
+        $row = DB::table('ratings')
             ->where('recipe_id', $recipeId->value())
             ->selectRaw('avg(score) as average, count(*) as count')
             ->first();
 
+        if ($row === null) {
+            return ['average' => null, 'count' => 0];
+        }
+
         return [
-            'average' => $row?->average !== null ? (float) $row->average : null,
-            'count' => (int) ($row?->count ?? 0),
+            'average' => $row->average !== null ? (float) $row->average : null,
+            'count' => (int) $row->count,
         ];
     }
 
@@ -51,7 +61,7 @@ final class EloquentRatingRepository implements RatingRepositoryInterface
             return [];
         }
 
-        $rows = EloquentRating::query()
+        $rows = DB::table('ratings')
             ->whereIn('recipe_id', array_map(static fn (Ulid $id) => $id->value(), $recipeIds))
             ->selectRaw('recipe_id, avg(score) as average, count(*) as count')
             ->groupBy('recipe_id')

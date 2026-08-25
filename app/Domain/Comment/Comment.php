@@ -42,7 +42,7 @@ final class Comment
     public function edit(string $body): void
     {
         $this->applyBody($body);
-        $this->editedAt = new DateTimeImmutable();
+        $this->editedAt = new DateTimeImmutable;
     }
 
     public function assertOwnedBy(Ulid $userId): void
