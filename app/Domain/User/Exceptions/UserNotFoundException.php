@@ -13,4 +13,9 @@ final class UserNotFoundException extends RuntimeException
     {
         return new self(sprintf('User "%s" not found.', $username->value()));
     }
+
+    public static function forUsernameString(string $username): self
+    {
+        return new self(sprintf('User "%s" not found.', $username));
+    }
 }

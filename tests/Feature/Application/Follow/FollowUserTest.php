@@ -42,3 +42,7 @@ it('throws when trying to follow yourself', function () {
 
     app(FollowUser::class)($user->value(), $username);
 })->throws(CannotFollowSelfException::class);
+
+it('throws UserNotFoundException for a malformed followee username', function () {
+    app(FollowUser::class)(anOwner()->value(), 'Gabriel');
+})->throws(UserNotFoundException::class);

@@ -9,6 +9,7 @@ use App\Domain\Shared\Ulid;
 use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Domain\User\Exceptions\UserNotFoundException;
 use App\Domain\User\Username;
+use InvalidArgumentException;
 
 final readonly class UnfollowUser
 {
@@ -19,7 +20,12 @@ final readonly class UnfollowUser
 
     public function __invoke(string $followerId, string $followeeUsername): void
     {
-        $followeeUsernameVo = Username::fromString($followeeUsername);
+        try {
+            $followeeUsernameVo = Username::fromString($followeeUsername);
+        } catch (InvalidArgumentException) {
+            throw UserNotFoundException::forUsernameString($followeeUsername);
+        }
+
         $followee = $this->users->findByUsername($followeeUsernameVo);
 
         if ($followee === null) {

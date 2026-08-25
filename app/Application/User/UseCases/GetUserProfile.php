@@ -6,6 +6,7 @@ use App\Application\User\DTOs\UserProfileOutput;
 use App\Domain\Follow\Contracts\FollowRepositoryInterface;
 use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Domain\User\Username;
+use InvalidArgumentException;
 
 final readonly class GetUserProfile
 {
@@ -16,7 +17,13 @@ final readonly class GetUserProfile
 
     public function __invoke(string $username): ?UserProfileOutput
     {
-        $user = $this->users->findByUsername(Username::fromString($username));
+        try {
+            $usernameVo = Username::fromString($username);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+
+        $user = $this->users->findByUsername($usernameVo);
 
         if ($user === null) {
             return null;

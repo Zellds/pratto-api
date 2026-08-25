@@ -79,3 +79,19 @@ it('requires authentication to unfollow', function () {
 
     $response->assertStatus(401);
 });
+
+it('returns 404 (not 500) when following a malformed username', function () {
+    $token = authenticatedToken($this);
+
+    $response = $this->withToken($token)->postJson('/api/users/Gabriel/follow');
+
+    $response->assertStatus(404);
+});
+
+it('returns 404 (not 500) when unfollowing a malformed username', function () {
+    $token = authenticatedToken($this);
+
+    $response = $this->withToken($token)->deleteJson('/api/users/Gabriel/follow');
+
+    $response->assertStatus(404);
+});

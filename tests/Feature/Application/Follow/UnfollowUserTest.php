@@ -34,3 +34,7 @@ it('is idempotent when unfollowing a user that was never followed', function () 
 it('throws when the followee username does not exist', function () {
     app(UnfollowUser::class)(anOwner()->value(), 'nao_existe');
 })->throws(UserNotFoundException::class);
+
+it('throws UserNotFoundException for a malformed followee username', function () {
+    app(UnfollowUser::class)(anOwner()->value(), 'Gabriel');
+})->throws(UserNotFoundException::class);

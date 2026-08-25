@@ -73,6 +73,12 @@ it('returns 404 for a username that does not exist', function () {
     $response->assertStatus(404);
 });
 
+it('returns 404 (not 500) for a malformed username', function () {
+    $response = $this->getJson('/api/users/Gabriel');
+
+    $response->assertStatus(404);
+});
+
 it('GET /me is an alias for the authenticated user\'s own public profile', function () {
     $token = authenticatedToken($this);
 

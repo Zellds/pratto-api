@@ -59,3 +59,9 @@ it('returns zero counts for a user nobody follows', function () {
     expect($output->followersCount)->toBe(0)
         ->and($output->followingCount)->toBe(0);
 });
+
+it('returns null for a malformed username instead of throwing', function () {
+    $output = app(GetUserProfile::class)('Gabriel');
+
+    expect($output)->toBeNull();
+});
