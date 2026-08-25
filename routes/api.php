@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RatingController;
@@ -15,6 +16,7 @@ Route::post('/login', LoginController::class);
 Route::get('/ingredients', [IngredientController::class, 'index']);
 Route::get('/recipes', [RecipeController::class, 'index']);
 Route::get('/recipes/{recipe}', [RecipeController::class, 'show']);
+Route::get('/recipes/{recipe}/comments', [CommentController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', LogoutController::class);
@@ -25,6 +27,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/recipes/{recipe}/publish', [RecipeController::class, 'publish']);
     Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy']);
     Route::put('/recipes/{recipe}/rating', [RatingController::class, 'store']);
+    Route::post('/recipes/{recipe}/comments', [CommentController::class, 'store']);
+    Route::patch('/comments/{comment}', [CommentController::class, 'update']);
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
 
     Route::post('/media', [MediaController::class, 'store']);
     Route::patch('/media/{media}/focal-point', [MediaController::class, 'focalPoint']);
