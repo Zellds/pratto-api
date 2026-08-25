@@ -10,6 +10,7 @@ use App\Application\Recipe\DTOs\RecipeIngredientInput;
 use App\Application\Recipe\DTOs\RecipeOutput;
 use App\Application\Recipe\DTOs\RecipeStepInput;
 use App\Application\Recipe\UseCases\CreateRecipe;
+use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
 use App\Domain\Recipe\Enums\MeasurementUnit;
@@ -172,4 +173,11 @@ function aPendingRecipePhoto(string $ownerId): MediaOutput
     return app(UploadMedia::class)(
         new UploadMediaInput($ownerId, 'recipe_photo', base_path('tests/fixtures/media/valid.jpg'), null, null),
     );
+}
+
+function createAPendingReviewRecipe(string $ownerId): RecipeOutput
+{
+    $draft = createADraft($ownerId);
+
+    return app(PublishRecipe::class)($draft->id, $ownerId);
 }
