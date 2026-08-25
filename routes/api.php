@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RatingController;
@@ -33,6 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/media', [MediaController::class, 'store']);
     Route::patch('/media/{media}/focal-point', [MediaController::class, 'focalPoint']);
+
+    Route::post('/users/{username}/follow', [FollowController::class, 'store']);
+    Route::delete('/users/{username}/follow', [FollowController::class, 'destroy']);
 
     Route::middleware('admin')->group(function () {
         Route::patch('/media/{media}/approve', [MediaController::class, 'approve']);
