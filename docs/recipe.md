@@ -13,6 +13,12 @@ Código-fonte de referência: `app/Domain/Recipe/Recipe.php`,
 `app/Domain/Recipe/RecipeStatus.php`, `app/Domain/Recipe/RecipeIngredient.php`,
 `app/Domain/Recipe/RecipeStep.php`, `app/Domain/Recipe/MeasurementUnit.php`.
 
+A resposta de receita (`RecipeResource`) também expõe campos agregados dos
+domínios `Rating` e `Comment` — `averageRating`/`ratingsCount` (ver
+[docs/rating.md](./rating.md), inclusive a limitação documentada de que só
+`GET /recipes`/`GET /recipes/{id}` calculam esses valores de verdade) e a
+listagem de comentários de uma receita (ver [docs/comment.md](./comment.md)).
+
 ## Ciclo de vida (status)
 
 `RecipeStatus` (`app/Domain/Recipe/RecipeStatus.php`) define quatro estados:
