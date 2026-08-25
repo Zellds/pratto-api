@@ -114,3 +114,30 @@ it('search with an owner returns every status owned by that user, including draf
     expect($results)->toHaveCount(1)
         ->and($results[0]->status())->toBe(RecipeStatus::Draft);
 });
+
+it('forOwners returns only pending_review/published recipes owned by the given users', function () {
+    $repository = app(RecipeRepositoryInterface::class);
+    $followedOwner = anOwner();
+    $otherOwner = anOwner();
+
+    $draft = Recipe::create(Ulid::generate(), $followedOwner, 'Rascunho', 'x', 8, 60, [RecipeIngredient::create(anIngredientId(), 1.0, MeasurementUnit::Gram, 0)], [RecipeStep::create(0, 'x')]);
+    $repository->save($draft);
+
+    $pendingReview = Recipe::create(Ulid::generate(), $followedOwner, 'Em revisão', 'x', 8, 60, [RecipeIngredient::create(anIngredientId(), 1.0, MeasurementUnit::Gram, 0)], [RecipeStep::create(0, 'x')]);
+    $pendingReview->publish();
+    $repository->save($pendingReview);
+
+    $notFollowed = Recipe::create(Ulid::generate(), $otherOwner, 'De outro dono', 'x', 8, 60, [RecipeIngredient::create(anIngredientId(), 1.0, MeasurementUnit::Gram, 0)], [RecipeStep::create(0, 'x')]);
+    $notFollowed->publish();
+    $repository->save($notFollowed);
+
+    $results = $repository->forOwners([$followedOwner], 1, 20);
+
+    expect(collect($results)->map(fn (Recipe $r) => $r->title())->all())->toBe(['Em revisão']);
+});
+
+it('forOwners returns an empty list for an empty owner list', function () {
+    $repository = app(RecipeRepositoryInterface::class);
+
+    expect($repository->forOwners([], 1, 20))->toBe([]);
+});

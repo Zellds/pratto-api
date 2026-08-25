@@ -85,6 +85,23 @@ final class EloquentRecipeRepository implements RecipeRepositoryInterface
         return $records->map(fn (EloquentRecipe $record) => $this->toDomain($record))->all();
     }
 
+    public function forOwners(array $ownerIds, int $page, int $perPage): array
+    {
+        if ($ownerIds === []) {
+            return [];
+        }
+
+        $records = EloquentRecipe::query()
+            ->with(['ingredients', 'steps'])
+            ->whereIn('user_id', array_map(static fn (Ulid $id) => $id->value(), $ownerIds))
+            ->whereIn('status', [RecipeStatus::PendingReview->value, RecipeStatus::Published->value])
+            ->orderByDesc('created_at')
+            ->forPage($page, $perPage)
+            ->get();
+
+        return $records->map(fn (EloquentRecipe $record) => $this->toDomain($record))->all();
+    }
+
     private function refreshSearchVector(EloquentRecipe $record): void
     {
         $ingredientNames = DB::table('recipe_ingredients')

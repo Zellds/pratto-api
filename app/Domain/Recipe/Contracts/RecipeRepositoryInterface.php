@@ -22,4 +22,15 @@ interface RecipeRepositoryInterface
      * @return list<Recipe>
      */
     public function search(?string $term, ?Ulid $ownerId, int $page, int $perPage): array;
+
+    /**
+     * Recipes owned by any of the given users, restricted to
+     * pending_review/published (same public-discovery rule as search()
+     * without an owner) — used by the follow feed, which never shows a
+     * followed user's drafts or rejected recipes.
+     *
+     * @param  list<Ulid>  $ownerIds
+     * @return list<Recipe>
+     */
+    public function forOwners(array $ownerIds, int $page, int $perPage): array;
 }
