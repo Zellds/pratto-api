@@ -23,3 +23,11 @@ it('posts a comment on a visible recipe', function () {
 it('throws when the recipe does not exist or is not visible', function () {
     app(PostComment::class)((string) new Ulid, anOwner()->value(), 'Oi.');
 })->throws(RecipeNotFoundException::class);
+
+it('throws when the recipe is a draft owned by someone else', function () {
+    $owner = anOwner();
+    $draft = createADraft($owner->value());
+    $intruder = anOwner();
+
+    app(PostComment::class)($draft->id, $intruder->value(), 'Tentando comentar.');
+})->throws(RecipeNotFoundException::class);

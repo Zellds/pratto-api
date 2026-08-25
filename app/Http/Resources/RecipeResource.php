@@ -21,7 +21,9 @@ class RecipeResource extends JsonResource
             'prepTimeMinutes' => $this->resource->prepTimeMinutes,
             'status' => $this->resource->status,
             'coverMediaId' => $this->resource->coverMediaId,
-            'averageRating' => $this->resource->averageRating,
+            'averageRating' => $this->resource->averageRating !== null
+                ? round($this->resource->averageRating, 1)
+                : null,
             'ratingsCount' => $this->resource->ratingsCount,
             'ingredients' => array_map(static fn ($ingredient) => [
                 'ingredientId' => $ingredient->ingredientId,

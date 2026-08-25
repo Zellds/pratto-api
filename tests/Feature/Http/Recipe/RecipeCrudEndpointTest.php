@@ -173,3 +173,19 @@ it('exposes averageRating and ratingsCount on the recipe response', function () 
         ->assertJsonPath('averageRating', 4)
         ->assertJsonPath('ratingsCount', 1);
 });
+
+it('rounds averageRating to 1 decimal place on the recipe response', function () {
+    $token = authenticatedToken($this);
+    $ownerId = EloquentUser::query()->where('username', 'gabriel')->value('id');
+    $draft = createADraft($ownerId);
+    app(PublishRecipe::class)($draft->id, $ownerId);
+    app(RateRecipe::class)($draft->id, anOwner()->value(), 4.0);
+    app(RateRecipe::class)($draft->id, anOwner()->value(), 4.5);
+    app(RateRecipe::class)($draft->id, anOwner()->value(), 4.5);
+
+    $response = $this->withToken($token)->getJson("/api/recipes/{$draft->id}");
+
+    // Raw average of 4.0, 4.5, 4.5 is 4.333333333333333 — RecipeResource rounds it
+    // to 1 decimal place at HTTP serialization, so the response shows 4.3.
+    $response->assertOk()->assertJsonPath('averageRating', 4.3);
+});

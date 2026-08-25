@@ -112,12 +112,19 @@ devolvem `average: null, count: 0` — não `0.0`. `RecipeOutput` reflete isso:
 `averageRating` é `float|null` (nulo = "sem nenhuma nota ainda"), `ratingsCount`
 é sempre um inteiro (`0` quando não há notas).
 
-**Sem arredondamento**: o valor devolvido é o `avg(score)` cru do Postgres —
-nenhum `round()` é aplicado em nenhuma camada. Uma receita com notas `4.0` e
-`5.0` de dois usuários diferentes devolve `averageRating: 4.5`; combinações
-que gerem dízimas (por exemplo três notas `4.0, 4.5, 5.0`) devolvem a média
-exata sem truncamento. Um cliente que queira exibir só uma casa decimal
-precisa arredondar no front.
+**Arredondamento na serialização HTTP**: o DTO (`RecipeOutput::$averageRating`)
+carrega o `avg(score)` cru do Postgres, sem nenhum arredondamento — a camada
+de domínio/aplicação nunca arredonda. O arredondamento para 1 casa decimal
+acontece só em `RecipeResource::toArray()` (`app/Http/Resources/RecipeResource.php`),
+usando o `round()` do PHP (que arredonda "meio para longe do zero", não
+"banker's rounding"), imediatamente antes de montar o corpo da resposta HTTP.
+Uma receita com notas `4.0` e `5.0` de dois usuários diferentes devolve
+`averageRating: 4.5` (já é exato, o `round()` não muda nada); combinações que
+gerem dízimas (por exemplo três notas `4.0, 4.5, 4.5`, média crua
+`4.333333333333333`) chegam na resposta como `averageRating: 4.3`. Um cliente
+não precisa mais arredondar no front para exibir uma casa decimal — mas quem
+usa o DTO diretamente (fora da camada HTTP) ainda vê o valor cru,
+não-arredondado.
 
 `json_encode` do PHP colapsa float "redondo" (`4.0`) para `4` na resposta
 (sem `JSON_PRESERVE_ZERO_FRACTION`) — `averageRating: 4.0` no DTO PHP chega

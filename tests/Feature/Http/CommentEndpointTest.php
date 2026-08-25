@@ -53,6 +53,32 @@ it('forbids a non-author from editing a comment', function () {
     $response->assertStatus(403);
 });
 
+it('forbids the recipe owner from editing a comment they did not author', function () {
+    $ownerToken = authenticatedTokenFor($this, 'moderating_owner');
+    $ownerId = EloquentUser::query()->where('username', 'moderating_owner')->value('id');
+    $recipe = createAPendingReviewRecipe($ownerId);
+    $authorToken = authenticatedTokenFor($this, 'moderated_comment_author');
+    $commentId = $this->withToken($authorToken)->postJson("/api/recipes/{$recipe->id}/comments", ['body' => 'Original.'])->json('id');
+    $this->app['auth']->forgetGuards();
+
+    $response = $this->withToken($ownerToken)->patchJson("/api/comments/{$commentId}", ['body' => 'Editado pelo dono.']);
+
+    $response->assertStatus(403);
+});
+
+it('forbids the recipe owner from deleting a comment they did not author', function () {
+    $ownerToken = authenticatedTokenFor($this, 'moderating_owner_2');
+    $ownerId = EloquentUser::query()->where('username', 'moderating_owner_2')->value('id');
+    $recipe = createAPendingReviewRecipe($ownerId);
+    $authorToken = authenticatedTokenFor($this, 'moderated_comment_author_2');
+    $commentId = $this->withToken($authorToken)->postJson("/api/recipes/{$recipe->id}/comments", ['body' => 'Não apagar.'])->json('id');
+    $this->app['auth']->forgetGuards();
+
+    $response = $this->withToken($ownerToken)->deleteJson("/api/comments/{$commentId}");
+
+    $response->assertStatus(403);
+});
+
 it('lets the author delete their own comment', function () {
     $ownerId = anOwner()->value();
     $recipe = createAPendingReviewRecipe($ownerId);
