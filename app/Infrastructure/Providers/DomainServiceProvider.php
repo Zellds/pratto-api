@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Providers;
 
+use App\Domain\Comment\Contracts\CommentRepositoryInterface;
 use App\Domain\Ingredient\Contracts\IngredientRepositoryInterface;
 use App\Domain\Media\Contracts\ImageProcessorInterface;
 use App\Domain\Media\Contracts\MediaRepositoryInterface;
@@ -13,6 +14,7 @@ use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Infrastructure\Auth\SanctumAccessTokenIssuer;
 use App\Infrastructure\Media\ImagePipeline;
 use App\Infrastructure\Media\TemporaryMediaUrlSigner;
+use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentCommentRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentIngredientRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentMediaRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentRatingRepository;
@@ -32,6 +34,7 @@ final class DomainServiceProvider extends ServiceProvider
         $this->app->bind(RecipeRepositoryInterface::class, EloquentRecipeRepository::class);
         $this->app->bind(MediaRepositoryInterface::class, EloquentMediaRepository::class);
         $this->app->bind(RatingRepositoryInterface::class, EloquentRatingRepository::class);
+        $this->app->bind(CommentRepositoryInterface::class, EloquentCommentRepository::class);
         $this->app->singleton(ImageManager::class, static fn () => ImageManager::gd());
         $this->app->bind(ImageProcessorInterface::class, ImagePipeline::class);
         $this->app->bind(MediaUrlSignerInterface::class, TemporaryMediaUrlSigner::class);
