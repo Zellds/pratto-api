@@ -1,4 +1,5 @@
 <?php
+
 // app/Application/Follow/UseCases/FollowUser.php
 
 namespace App\Application\Follow\UseCases;

@@ -1,4 +1,5 @@
 <?php
+
 // app/Domain/User/Exceptions/UserNotFoundException.php
 
 namespace App\Domain\User\Exceptions;

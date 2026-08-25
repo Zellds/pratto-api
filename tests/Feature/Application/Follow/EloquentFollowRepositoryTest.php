@@ -1,4 +1,5 @@
 <?php
+
 // tests/Feature/Application/Follow/EloquentFollowRepositoryTest.php
 
 use App\Domain\Follow\Contracts\FollowRepositoryInterface;

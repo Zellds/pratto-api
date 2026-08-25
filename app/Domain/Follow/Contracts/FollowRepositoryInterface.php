@@ -1,4 +1,5 @@
 <?php
+
 // app/Domain/Follow/Contracts/FollowRepositoryInterface.php
 
 namespace App\Domain\Follow\Contracts;

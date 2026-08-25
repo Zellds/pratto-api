@@ -1,4 +1,5 @@
 <?php
+
 // app/Domain/Follow/Exceptions/CannotFollowSelfException.php
 
 namespace App\Domain\Follow\Exceptions;

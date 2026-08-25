@@ -1,4 +1,5 @@
 <?php
+
 // app/Infrastructure/Persistence/Eloquent/Repositories/EloquentFollowRepository.php
 
 namespace App\Infrastructure\Persistence\Eloquent\Repositories;

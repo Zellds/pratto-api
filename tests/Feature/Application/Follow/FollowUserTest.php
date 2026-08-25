@@ -1,4 +1,5 @@
 <?php
+
 // tests/Feature/Application/Follow/FollowUserTest.php
 
 use App\Application\Follow\UseCases\FollowUser;

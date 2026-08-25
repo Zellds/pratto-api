@@ -1,4 +1,5 @@
 <?php
+
 // app/Application/Follow/UseCases/UnfollowUser.php
 
 namespace App\Application\Follow\UseCases;

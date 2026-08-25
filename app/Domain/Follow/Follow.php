@@ -1,4 +1,5 @@
 <?php
+
 // app/Domain/Follow/Follow.php
 
 namespace App\Domain\Follow;
@@ -12,13 +13,13 @@ use DateTimeImmutable;
  * following another. Has no editable state — it either exists or it
  * doesn't — so there is no update method, only create/reconstitute.
  */
-final class Follow
+final readonly class Follow
 {
     private function __construct(
-        private readonly Ulid $id,
-        private readonly Ulid $followerId,
-        private readonly Ulid $followeeId,
-        private readonly DateTimeImmutable $createdAt,
+        private Ulid $id,
+        private Ulid $followerId,
+        private Ulid $followeeId,
+        private DateTimeImmutable $createdAt,
     ) {}
 
     public static function create(Ulid $id, Ulid $followerId, Ulid $followeeId): self
@@ -27,7 +28,7 @@ final class Follow
             throw CannotFollowSelfException::forUser($followerId);
         }
 
-        return new self($id, $followerId, $followeeId, new DateTimeImmutable());
+        return new self($id, $followerId, $followeeId, new DateTimeImmutable);
     }
 
     public static function reconstitute(Ulid $id, Ulid $followerId, Ulid $followeeId, DateTimeImmutable $createdAt): self

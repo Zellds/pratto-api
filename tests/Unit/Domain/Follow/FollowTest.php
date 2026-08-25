@@ -1,4 +1,5 @@
 <?php
+
 // tests/Unit/Domain/Follow/FollowTest.php
 
 use App\Domain\Follow\Exceptions\CannotFollowSelfException;

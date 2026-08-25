@@ -1,4 +1,5 @@
 <?php
+
 // app/Infrastructure/Persistence/Eloquent/Models/EloquentFollow.php
 
 namespace App\Infrastructure\Persistence\Eloquent\Models;
