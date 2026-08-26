@@ -18,10 +18,10 @@ class UpdatePantryItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'needs_to_buy' => ['nullable', 'boolean'],
-            'quantity' => ['nullable', 'numeric', 'min:0.01'],
-            'unit' => ['nullable', 'string', Rule::in(array_column(MeasurementUnit::cases(), 'value'))],
-            'is_fixed' => ['nullable', 'boolean'],
+            'needs_to_buy' => ['boolean'],
+            'quantity' => ['numeric', 'min:0.01'],
+            'unit' => ['string', Rule::in(array_column(MeasurementUnit::cases(), 'value'))],
+            'is_fixed' => ['boolean'],
         ];
     }
 }

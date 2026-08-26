@@ -20,9 +20,9 @@ class AddPantryItemRequest extends FormRequest
         return [
             'ingredient_id' => ['nullable', 'string', 'exists:ingredients,id'],
             'ingredient_name' => ['required_without:ingredient_id', 'nullable', 'string', 'max:80'],
-            'quantity' => ['nullable', 'numeric', 'min:0.01'],
-            'unit' => ['nullable', 'string', Rule::in(array_column(MeasurementUnit::cases(), 'value'))],
-            'is_fixed' => ['nullable', 'boolean'],
+            'quantity' => ['numeric', 'min:0.01'],
+            'unit' => ['string', Rule::in(array_column(MeasurementUnit::cases(), 'value'))],
+            'is_fixed' => ['boolean'],
         ];
     }
 }

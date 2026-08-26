@@ -89,3 +89,47 @@ it('requires authentication for every item route', function () {
     $this->postJson("/api/pantries/{$pantry->id}/items", ['ingredient_name' => 'Cebola'])->assertStatus(401);
     $this->getJson("/api/pantries/{$pantry->id}/items")->assertStatus(401);
 });
+
+it('rejects an explicit null quantity with 422 instead of a 500', function () {
+    $token = authenticatedToken($this);
+    $pantry = $this->withToken($token)->postJson('/api/pantries', ['name' => 'Minha despensa'])->json();
+
+    $response = $this->withToken($token)->postJson("/api/pantries/{$pantry['id']}/items", [
+        'ingredient_name' => 'Cebola',
+        'quantity' => null,
+    ]);
+
+    $response->assertStatus(422);
+});
+
+it('rejects an explicit null unit with 422 instead of a 500', function () {
+    $token = authenticatedToken($this);
+    $pantry = $this->withToken($token)->postJson('/api/pantries', ['name' => 'Minha despensa'])->json();
+
+    $response = $this->withToken($token)->postJson("/api/pantries/{$pantry['id']}/items", [
+        'ingredient_name' => 'Cebola',
+        'unit' => null,
+    ]);
+
+    $response->assertStatus(422);
+});
+
+it('rejects an explicit null needs_to_buy on update instead of silently marking it false', function () {
+    $token = authenticatedToken($this);
+    $pantry = $this->withToken($token)->postJson('/api/pantries', ['name' => 'Minha despensa'])->json();
+    $item = $this->withToken($token)->postJson("/api/pantries/{$pantry['id']}/items", ['ingredient_name' => 'Cebola'])->json();
+
+    $response = $this->withToken($token)->patchJson("/api/pantries/{$pantry['id']}/items/{$item['id']}", ['needs_to_buy' => null]);
+
+    $response->assertStatus(422);
+});
+
+it('rejects an explicit null is_fixed on update with 422', function () {
+    $token = authenticatedToken($this);
+    $pantry = $this->withToken($token)->postJson('/api/pantries', ['name' => 'Minha despensa'])->json();
+    $item = $this->withToken($token)->postJson("/api/pantries/{$pantry['id']}/items", ['ingredient_name' => 'Cebola'])->json();
+
+    $response = $this->withToken($token)->patchJson("/api/pantries/{$pantry['id']}/items/{$item['id']}", ['is_fixed' => null]);
+
+    $response->assertStatus(422);
+});
