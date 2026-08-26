@@ -12,18 +12,18 @@ use DateTimeImmutable;
  * Never represents the owner: PantryMembershipRepositoryInterface::hasAccess()
  * checks ownership separately.
  */
-final class PantryMembership
+final readonly class PantryMembership
 {
     private function __construct(
-        private readonly Ulid $id,
-        private readonly Ulid $pantryId,
-        private readonly Ulid $userId,
-        private readonly DateTimeImmutable $createdAt,
+        private Ulid $id,
+        private Ulid $pantryId,
+        private Ulid $userId,
+        private DateTimeImmutable $createdAt,
     ) {}
 
     public static function create(Ulid $id, Ulid $pantryId, Ulid $userId): self
     {
-        return new self($id, $pantryId, $userId, new DateTimeImmutable());
+        return new self($id, $pantryId, $userId, new DateTimeImmutable);
     }
 
     public static function reconstitute(Ulid $id, Ulid $pantryId, Ulid $userId, DateTimeImmutable $createdAt): self

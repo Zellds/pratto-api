@@ -12,6 +12,8 @@ use InvalidArgumentException;
  * toggled/edited one at a time, far more often than the pantry itself
  * changes — same reasoning that already keeps Comment independent of
  * Recipe rather than following RecipeIngredient/RecipeStep's pattern.
+ *
+ * @SuppressWarnings("PHPMD.TooManyPublicMethods")
  */
 final class PantryItem
 {

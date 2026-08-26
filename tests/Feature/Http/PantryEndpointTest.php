@@ -1,5 +1,6 @@
 <?php
 
+use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -62,7 +63,7 @@ it('returns 403 when a member (not the owner) tries to delete', function () {
     $ownerToken = authenticatedToken($this);
     $created = $this->withToken($ownerToken)->postJson('/api/pantries', ['name' => 'Minha despensa'])->json();
     $memberToken = authenticatedTokenFor($this, 'member_user');
-    aPantryMember($created['id'], App\Infrastructure\Persistence\Eloquent\Models\EloquentUser::query()->where('username', 'gabriel')->value('id'), 'member_user');
+    aPantryMember($created['id'], EloquentUser::query()->where('username', 'gabriel')->value('id'), 'member_user');
     $this->app['auth']->forgetGuards();
 
     $response = $this->withToken($memberToken)->deleteJson("/api/pantries/{$created['id']}");

@@ -9,7 +9,6 @@ use App\Domain\Pantry\Contracts\PantryItemRepositoryInterface;
 use App\Domain\Pantry\Contracts\PantryMembershipRepositoryInterface;
 use App\Domain\Pantry\Contracts\PantryRepositoryInterface;
 use App\Domain\Pantry\Exceptions\PantryNotFoundException;
-use App\Domain\Pantry\PantryItem;
 use App\Domain\Shared\Ulid;
 
 final readonly class ListPantryItems
@@ -33,7 +32,7 @@ final readonly class ListPantryItems
         }
 
         return array_map(
-            fn (PantryItem $item) => PantryItemOutput::fromDomain($item),
+            PantryItemOutput::fromDomain(...),
             $this->items->forPantry($pantryUlid),
         );
     }
