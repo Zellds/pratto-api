@@ -8,6 +8,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\PantryController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\UserProfileController;
@@ -40,6 +41,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/users/{username}/follow', [FollowController::class, 'store']);
     Route::delete('/users/{username}/follow', [FollowController::class, 'destroy']);
     Route::get('/feed', [FeedController::class, 'index']);
+
+    Route::post('/pantries', [PantryController::class, 'store']);
+    Route::get('/pantries', [PantryController::class, 'index']);
+    Route::delete('/pantries/{pantry}', [PantryController::class, 'destroy']);
 
     Route::middleware('admin')->group(function () {
         Route::patch('/media/{media}/approve', [MediaController::class, 'approve']);
