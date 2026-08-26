@@ -93,6 +93,13 @@ final class EloquentUserRepository implements UserRepositoryInterface
         return $this->toDomain($record);
     }
 
+    public function findById(Ulid $id): ?User
+    {
+        $record = EloquentUser::query()->find($id->value());
+
+        return $record === null ? null : $this->toDomain($record);
+    }
+
     private function toDomain(EloquentUser $record): User
     {
         $user = User::register(

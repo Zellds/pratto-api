@@ -8,6 +8,7 @@ use App\Application\Media\DTOs\UploadMediaInput;
 use App\Application\Media\UseCases\UploadMedia;
 use App\Application\Pantry\DTOs\PantryOutput;
 use App\Application\Pantry\UseCases\CreatePantry;
+use App\Application\Pantry\UseCases\InvitePantryMember;
 use App\Application\Recipe\DTOs\CreateRecipeInput;
 use App\Application\Recipe\DTOs\RecipeIngredientInput;
 use App\Application\Recipe\DTOs\RecipeOutput;
@@ -16,8 +17,6 @@ use App\Application\Recipe\UseCases\CreateRecipe;
 use App\Application\Recipe\UseCases\PublishRecipe;
 use App\Application\User\DTOs\RegisterUserInput;
 use App\Application\User\UseCases\RegisterUser;
-use App\Domain\Pantry\Contracts\PantryMembershipRepositoryInterface;
-use App\Domain\Pantry\PantryMembership;
 use App\Domain\Recipe\Enums\MeasurementUnit;
 use App\Domain\Recipe\RecipeIngredient;
 use App\Domain\Recipe\RecipeStep;
@@ -201,9 +200,5 @@ function aPantry(string $ownerId, string $name = 'Minha despensa'): PantryOutput
 
 function aPantryMember(string $pantryId, string $ownerId, string $inviteeUsername): void
 {
-    $inviteeId = EloquentUser::query()->where('username', $inviteeUsername)->value('id');
-
-    app(PantryMembershipRepositoryInterface::class)->save(
-        PantryMembership::create(Ulid::generate(), Ulid::fromString($pantryId), Ulid::fromString($inviteeId)),
-    );
+    app(InvitePantryMember::class)($pantryId, $ownerId, $inviteeUsername);
 }

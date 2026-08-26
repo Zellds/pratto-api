@@ -3,6 +3,7 @@
 // tests/Feature/Application/User/EloquentUserRepositoryTest.php
 
 use App\Domain\Shared\Ulid;
+use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Domain\User\DisplayName;
 use App\Domain\User\Exceptions\DuplicateUsernameException;
 use App\Domain\User\User;
@@ -55,4 +56,20 @@ it('throws DuplicateUsernameException instead of a raw DB error on a unique-cons
         User::register(Ulid::generate(), $username, DisplayName::fromString('Segunda')),
         'outra-senha-123',
     ))->toThrow(DuplicateUsernameException::class);
+});
+
+it('finds a user by id', function () {
+    $repository = app(UserRepositoryInterface::class);
+    $registered = anOwner();
+
+    $found = $repository->findById($registered);
+
+    expect($found)->not->toBeNull()
+        ->and($found->id()->equals($registered))->toBeTrue();
+});
+
+it('returns null when no user exists for that id', function () {
+    $repository = app(UserRepositoryInterface::class);
+
+    expect($repository->findById(Ulid::generate()))->toBeNull();
 });
