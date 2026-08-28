@@ -26,6 +26,8 @@ class EloquentUser extends Authenticatable
         'banned_at',
         'ban_reason',
         'banned_by',
+        'google_id',
+        'email',
     ];
 
     protected $casts = [

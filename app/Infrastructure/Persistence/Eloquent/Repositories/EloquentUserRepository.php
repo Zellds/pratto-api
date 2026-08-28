@@ -8,6 +8,7 @@ use App\Domain\User\DisplayName;
 use App\Domain\User\Enums\UserRole;
 use App\Domain\User\Enums\UserStatus;
 use App\Domain\User\Exceptions\DuplicateUsernameException;
+use App\Domain\User\Exceptions\GoogleAccountAlreadyLinkedException;
 use App\Domain\User\User;
 use App\Domain\User\Username;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser;
@@ -106,6 +107,59 @@ final class EloquentUserRepository implements UserRepositoryInterface
         $record = EloquentUser::query()->find($id->value());
 
         return $record === null ? null : $this->toDomain($record);
+    }
+
+    public function findByGoogleId(string $googleId): ?User
+    {
+        $record = EloquentUser::query()->where('google_id', $googleId)->first();
+
+        return $record === null ? null : $this->toDomain($record);
+    }
+
+    public function registerWithGoogle(User $user, string $googleId, ?string $email): void
+    {
+        try {
+            DB::transaction(function () use ($user, $googleId, $email): void {
+                EloquentUser::query()->create([
+                    'id' => $user->id()->value(),
+                    'username' => $user->username()->value(),
+                    'display_name' => $user->displayName()->value(),
+                    'bio' => $user->bio(),
+                    'password' => bcrypt(str()->random(32)),
+                    'google_id' => $googleId,
+                    'email' => $email,
+                ]);
+            });
+        } catch (QueryException $exception) {
+            if ($this->isUniqueConstraintViolation($exception)) {
+                if (str_contains(strtolower($this->driverErrorMessage($exception)), 'google_id')) {
+                    throw GoogleAccountAlreadyLinkedException::forGoogleId($googleId);
+                }
+
+                throw DuplicateUsernameException::forUsername($user->username());
+            }
+
+            throw $exception;
+        }
+    }
+
+    /**
+     * Isolates the database driver's own error text from the exception
+     * message, stripping the "(Connection: ..., SQL: ...)" debug suffix
+     * Laravel appends. Without this, the appended SQL — which always
+     * lists every inserted column, including google_id — would make a
+     * plain username collision look like a google_id collision too.
+     */
+    private function driverErrorMessage(QueryException $exception): string
+    {
+        $driverMessage = strstr($exception->getMessage(), ' (Connection: ', true);
+
+        return $driverMessage !== false ? $driverMessage : $exception->getMessage();
+    }
+
+    public function linkGoogleId(Ulid $id, string $googleId): void
+    {
+        EloquentUser::query()->whereKey($id->value())->update(['google_id' => $googleId]);
     }
 
     private function toDomain(EloquentUser $record): User

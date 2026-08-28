@@ -9,6 +9,7 @@ use App\Domain\User\DisplayName;
 use App\Domain\User\Enums\UserRole;
 use App\Domain\User\Enums\UserStatus;
 use App\Domain\User\Exceptions\DuplicateUsernameException;
+use App\Domain\User\Exceptions\GoogleAccountAlreadyLinkedException;
 use App\Domain\User\User;
 use App\Domain\User\Username;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser as EloquentUserModel;
@@ -120,4 +121,54 @@ it('revokes every access token for a user', function () {
     $issuer->revokeAllFor($userId);
 
     expect(EloquentUserModel::query()->find($userId->value())->tokens()->count())->toBe(0);
+});
+
+it('persists and hydrates a user registered via google', function () {
+    $repository = app(UserRepositoryInterface::class);
+    $user = User::register(Ulid::generate(), Username::fromString('google_user_1'), DisplayName::fromString('Google User'));
+
+    $repository->registerWithGoogle($user, 'google-sub-123', 'user@example.com');
+
+    $found = $repository->findByGoogleId('google-sub-123');
+    expect($found)->not->toBeNull()
+        ->and($found->username()->value())->toBe('google_user_1');
+
+    $byUsername = $repository->findByUsername(Username::fromString('google_user_1'));
+    expect($byUsername->id()->equals($user->id()))->toBeTrue();
+});
+
+it('returns null for an unknown google id', function () {
+    $repository = app(UserRepositoryInterface::class);
+
+    expect($repository->findByGoogleId('does-not-exist'))->toBeNull();
+});
+
+it('throws DuplicateUsernameException when registering via google with a taken username', function () {
+    $repository = app(UserRepositoryInterface::class);
+    $existing = User::register(Ulid::generate(), Username::fromString('taken_name'), DisplayName::fromString('Existing'));
+    $repository->registerWithGoogle($existing, 'google-sub-a', null);
+
+    $newUser = User::register(Ulid::generate(), Username::fromString('taken_name'), DisplayName::fromString('New'));
+
+    $repository->registerWithGoogle($newUser, 'google-sub-b', null);
+})->throws(DuplicateUsernameException::class);
+
+it('throws GoogleAccountAlreadyLinkedException when the google id is already registered', function () {
+    $repository = app(UserRepositoryInterface::class);
+    $existing = User::register(Ulid::generate(), Username::fromString('first_user'), DisplayName::fromString('First'));
+    $repository->registerWithGoogle($existing, 'shared-google-id', null);
+
+    $newUser = User::register(Ulid::generate(), Username::fromString('second_user'), DisplayName::fromString('Second'));
+
+    $repository->registerWithGoogle($newUser, 'shared-google-id', null);
+})->throws(GoogleAccountAlreadyLinkedException::class);
+
+it('links a google id to an existing user', function () {
+    $repository = app(UserRepositoryInterface::class);
+    $owner = anOwner();
+
+    $repository->linkGoogleId($owner, 'link-google-id');
+
+    $found = $repository->findByGoogleId('link-google-id');
+    expect($found->id()->equals($owner))->toBeTrue();
 });
