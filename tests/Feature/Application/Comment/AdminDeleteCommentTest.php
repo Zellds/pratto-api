@@ -5,6 +5,7 @@
 use App\Application\Comment\UseCases\AdminDeleteComment;
 use App\Application\Comment\UseCases\PostComment;
 use App\Domain\Comment\Contracts\CommentRepositoryInterface;
+use App\Domain\Comment\Exceptions\CommentNotFoundException;
 use App\Domain\Shared\Ulid;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -23,4 +24,4 @@ it('deletes any comment regardless of ownership', function () {
 
 it('throws CommentNotFoundException when deleting a non-existent comment', function () {
     app(AdminDeleteComment::class)((string) Ulid::generate());
-})->throws(App\Domain\Comment\Exceptions\CommentNotFoundException::class);
+})->throws(CommentNotFoundException::class);

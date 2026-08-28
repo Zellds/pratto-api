@@ -1,13 +1,16 @@
 <?php
+
 // tests/Feature/Application/User/ModerateUserTest.php
 
 use App\Application\User\UseCases\BanUser;
 use App\Application\User\UseCases\PromoteToAdmin;
 use App\Application\User\UseCases\UnbanUser;
+use App\Domain\Shared\Ulid;
 use App\Domain\User\Contracts\AccessTokenIssuerInterface;
 use App\Domain\User\Contracts\UserRepositoryInterface;
+use App\Domain\User\Exceptions\UserNotFoundException;
 
-function usernameOf(App\Domain\Shared\Ulid $id): string
+function usernameOf(Ulid $id): string
 {
     return app(UserRepositoryInterface::class)->findById($id)->username()->value();
 }
@@ -60,4 +63,4 @@ it('throws UserNotFoundException when banning a non-existent username', function
     $adminId = anAdmin();
 
     app(BanUser::class)('ninguem', $adminId->value(), 'Motivo.');
-})->throws(App\Domain\User\Exceptions\UserNotFoundException::class);
+})->throws(UserNotFoundException::class);

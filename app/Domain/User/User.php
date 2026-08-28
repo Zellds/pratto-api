@@ -120,7 +120,7 @@ final class User
         }
 
         $this->status = UserStatus::Banned;
-        $this->bannedAt = new DateTimeImmutable();
+        $this->bannedAt = new DateTimeImmutable;
         $this->banReason = $trimmed;
         $this->bannedBy = $bannedBy;
     }

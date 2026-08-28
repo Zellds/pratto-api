@@ -4,6 +4,7 @@ use App\Application\Ingredient\UseCases\ApproveIngredient;
 use App\Application\Ingredient\UseCases\RejectIngredient;
 use App\Domain\Ingredient\Contracts\IngredientRepositoryInterface;
 use App\Domain\Ingredient\Enums\IngredientStatus;
+use App\Domain\Ingredient\Exceptions\IngredientNotFoundException;
 use App\Domain\Shared\Ulid;
 
 it('approves a provisional ingredient', function () {
@@ -30,4 +31,4 @@ it('rejects a provisional ingredient', function () {
 
 it('throws IngredientNotFoundException when approving a non-existent ingredient', function () {
     app(ApproveIngredient::class)((string) Ulid::generate());
-})->throws(App\Domain\Ingredient\Exceptions\IngredientNotFoundException::class);
+})->throws(IngredientNotFoundException::class);

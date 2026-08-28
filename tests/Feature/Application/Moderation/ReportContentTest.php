@@ -1,9 +1,9 @@
 <?php
 
+use App\Application\Comment\UseCases\PostComment;
 use App\Application\Moderation\UseCases\ReportContent;
-use App\Domain\Moderation\Contracts\ReportRepositoryInterface;
-use App\Domain\Moderation\Enums\ReportStatus;
-use App\Domain\Moderation\Enums\ReportTargetType;
+use App\Domain\Moderation\Exceptions\CannotReportSelfException;
+use App\Domain\Moderation\Exceptions\ReportedTargetNotFoundException;
 use App\Domain\Shared\Ulid;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -34,7 +34,7 @@ it('reports a comment', function () {
     $owner = anOwner();
     $reporter = anOwner();
     $recipe = createAPendingReviewRecipe($owner->value());
-    $comment = app(App\Application\Comment\UseCases\PostComment::class)($recipe->id, $reporter->value(), 'Comentário.');
+    $comment = app(PostComment::class)($recipe->id, $reporter->value(), 'Comentário.');
     $secondReporter = anOwner();
 
     $output = app(ReportContent::class)($secondReporter->value(), 'comment', $comment->id, 'Spam.');
@@ -46,10 +46,10 @@ it('throws when a user reports themselves', function () {
     $user = anOwner();
 
     app(ReportContent::class)($user->value(), 'user', $user->value(), 'Motivo.');
-})->throws(App\Domain\Moderation\Exceptions\CannotReportSelfException::class);
+})->throws(CannotReportSelfException::class);
 
 it('throws when the reported recipe does not exist', function () {
     $reporter = anOwner();
 
     app(ReportContent::class)($reporter->value(), 'recipe', (string) Ulid::generate(), 'Motivo.');
-})->throws(App\Domain\Moderation\Exceptions\ReportedTargetNotFoundException::class);
+})->throws(ReportedTargetNotFoundException::class);

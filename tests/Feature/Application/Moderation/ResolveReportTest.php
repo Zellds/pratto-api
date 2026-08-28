@@ -2,6 +2,7 @@
 
 use App\Application\Moderation\UseCases\ReportContent;
 use App\Application\Moderation\UseCases\ResolveReport;
+use App\Domain\Moderation\Exceptions\ReportNotFoundException;
 use App\Domain\Shared\Ulid;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -35,4 +36,4 @@ it('resolves a report as dismissed without a note', function () {
 
 it('throws ReportNotFoundException when resolving a non-existent report', function () {
     app(ResolveReport::class)((string) Ulid::generate(), anAdmin()->value(), 'dismissed', null);
-})->throws(App\Domain\Moderation\Exceptions\ReportNotFoundException::class);
+})->throws(ReportNotFoundException::class);

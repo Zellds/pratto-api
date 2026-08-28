@@ -37,7 +37,7 @@ final class Report
             throw new InvalidArgumentException('Report reason cannot be empty.');
         }
 
-        return new self($id, $reporterId, $targetType, $targetId, $trimmed, ReportStatus::Open, null, null, null, new DateTimeImmutable());
+        return new self($id, $reporterId, $targetType, $targetId, $trimmed, ReportStatus::Open, null, null, null, new DateTimeImmutable);
     }
 
     public static function reconstitute(
@@ -64,7 +64,7 @@ final class Report
         $this->status = $status;
         $this->resolutionNote = $note;
         $this->resolvedBy = $adminId;
-        $this->resolvedAt = new DateTimeImmutable();
+        $this->resolvedAt = new DateTimeImmutable;
     }
 
     public function id(): Ulid

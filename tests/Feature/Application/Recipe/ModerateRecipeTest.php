@@ -3,6 +3,7 @@
 use App\Application\Recipe\UseCases\ApproveRecipe;
 use App\Application\Recipe\UseCases\RejectRecipe;
 use App\Domain\Recipe\Contracts\RecipeRepositoryInterface;
+use App\Domain\Recipe\Exceptions\RecipeNotFoundException;
 use App\Domain\Shared\Ulid;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -48,4 +49,4 @@ it('throws RecipeNotFoundException when approving a non-existent recipe', functi
     $reviewer = anAdmin();
 
     app(ApproveRecipe::class)((string) Ulid::generate(), $reviewer->value());
-})->throws(App\Domain\Recipe\Exceptions\RecipeNotFoundException::class);
+})->throws(RecipeNotFoundException::class);

@@ -123,7 +123,7 @@ final class Recipe
         $this->status = RecipeStatus::Published;
         $this->rejectionReason = null;
         $this->reviewedBy = $reviewerId;
-        $this->reviewedAt = new DateTimeImmutable();
+        $this->reviewedAt = new DateTimeImmutable;
     }
 
     /**
@@ -144,7 +144,7 @@ final class Recipe
         $this->rejectionReason = $trimmed;
         $this->wasEverRejected = true;
         $this->reviewedBy = $reviewerId;
-        $this->reviewedAt = new DateTimeImmutable();
+        $this->reviewedAt = new DateTimeImmutable;
     }
 
     public function assertOwnedBy(Ulid $userId): void
