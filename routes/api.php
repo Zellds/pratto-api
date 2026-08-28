@@ -13,6 +13,7 @@ use App\Http\Controllers\PantryItemController;
 use App\Http\Controllers\PantryMemberController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\UserModerationController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,5 +65,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/recipes/{recipe}/reject', [RecipeController::class, 'reject']);
         Route::patch('/ingredients/{ingredient}/approve', [IngredientController::class, 'approve']);
         Route::patch('/ingredients/{ingredient}/reject', [IngredientController::class, 'reject']);
+        Route::patch('/users/{username}/promote', [UserModerationController::class, 'promote']);
+        Route::patch('/users/{username}/ban', [UserModerationController::class, 'ban']);
+        Route::patch('/users/{username}/unban', [UserModerationController::class, 'unban']);
     });
 });
