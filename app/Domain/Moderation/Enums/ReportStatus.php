@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Domain\Moderation\Enums;
+
+enum ReportStatus: string
+{
+    case Open = 'open';
+    case Reviewed = 'reviewed';
+    case Dismissed = 'dismissed';
+}
