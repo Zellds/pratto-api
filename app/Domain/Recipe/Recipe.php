@@ -6,6 +6,7 @@ use App\Domain\Recipe\Enums\RecipeStatus;
 use App\Domain\Recipe\Exceptions\InvalidRecipeStatusTransitionException;
 use App\Domain\Recipe\Exceptions\RecipeNotOwnedException;
 use App\Domain\Shared\Ulid;
+use DateTimeImmutable;
 use InvalidArgumentException;
 
 /**
@@ -32,6 +33,10 @@ final class Recipe
         private array $ingredients,
         private array $steps,
         private ?Ulid $coverMediaId = null,
+        private ?string $rejectionReason = null,
+        private bool $wasEverRejected = false,
+        private ?Ulid $reviewedBy = null,
+        private ?DateTimeImmutable $reviewedAt = null,
     ) {}
 
     /**
@@ -69,9 +74,16 @@ final class Recipe
         RecipeStatus $status,
         array $ingredients,
         array $steps,
-        ?Ulid $coverMediaId = null,
+        ?Ulid $coverMediaId,
+        ?string $rejectionReason,
+        bool $wasEverRejected,
+        ?Ulid $reviewedBy,
+        ?DateTimeImmutable $reviewedAt,
     ): self {
-        return new self($id, $ownerId, $title, $description, $portions, $prepTimeMinutes, $status, $ingredients, $steps, $coverMediaId);
+        return new self(
+            $id, $ownerId, $title, $description, $portions, $prepTimeMinutes, $status, $ingredients, $steps,
+            $coverMediaId, $rejectionReason, $wasEverRejected, $reviewedBy, $reviewedAt,
+        );
     }
 
     /**
@@ -101,6 +113,40 @@ final class Recipe
         $this->status = RecipeStatus::PendingReview;
     }
 
+    /**
+     * Sem guarda de status — funciona a partir de qualquer status atual,
+     * mesmo padrão de Media::approve() (Plano 3): cobre reaprovar depois
+     * do fato, não só a primeira revisão.
+     */
+    public function approve(Ulid $reviewerId): void
+    {
+        $this->status = RecipeStatus::Published;
+        $this->rejectionReason = null;
+        $this->reviewedBy = $reviewerId;
+        $this->reviewedAt = new DateTimeImmutable();
+    }
+
+    /**
+     * Sem guarda de status — cobre rejeitar (tirar do ar) uma receita já
+     * published que foi denunciada depois. wasEverRejected nunca é resetada
+     * por approve() nem por update(): uma vez rejeitada, todo reenvio fica
+     * escondido até um admin aprovar de verdade (ver isVisibleTo()).
+     */
+    public function reject(Ulid $reviewerId, string $reason): void
+    {
+        $trimmed = trim($reason);
+
+        if ($trimmed === '') {
+            throw new InvalidArgumentException('Rejection reason cannot be empty.');
+        }
+
+        $this->status = RecipeStatus::Rejected;
+        $this->rejectionReason = $trimmed;
+        $this->wasEverRejected = true;
+        $this->reviewedBy = $reviewerId;
+        $this->reviewedAt = new DateTimeImmutable();
+    }
+
     public function assertOwnedBy(Ulid $userId): void
     {
         if (! $this->ownerId->equals($userId)) {
@@ -110,11 +156,15 @@ final class Recipe
 
     public function isVisibleTo(?Ulid $viewerId): bool
     {
-        if (in_array($this->status, [RecipeStatus::PendingReview, RecipeStatus::Published], true)) {
+        if ($viewerId !== null && $this->ownerId->equals($viewerId)) {
             return true;
         }
 
-        return $viewerId !== null && $this->ownerId->equals($viewerId);
+        return match ($this->status) {
+            RecipeStatus::Published => true,
+            RecipeStatus::PendingReview => ! $this->wasEverRejected,
+            RecipeStatus::Draft, RecipeStatus::Rejected => false,
+        };
     }
 
     /**
@@ -231,5 +281,25 @@ final class Recipe
     public function coverMediaId(): ?Ulid
     {
         return $this->coverMediaId;
+    }
+
+    public function rejectionReason(): ?string
+    {
+        return $this->rejectionReason;
+    }
+
+    public function wasEverRejected(): bool
+    {
+        return $this->wasEverRejected;
+    }
+
+    public function reviewedBy(): ?Ulid
+    {
+        return $this->reviewedBy;
+    }
+
+    public function reviewedAt(): ?DateTimeImmutable
+    {
+        return $this->reviewedAt;
     }
 }
