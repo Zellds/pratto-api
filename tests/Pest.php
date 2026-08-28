@@ -21,6 +21,9 @@ use App\Domain\Recipe\Enums\MeasurementUnit;
 use App\Domain\Recipe\RecipeIngredient;
 use App\Domain\Recipe\RecipeStep;
 use App\Domain\Shared\Ulid;
+use App\Domain\User\Contracts\GoogleIdTokenVerifierInterface;
+use App\Domain\User\Exceptions\InvalidGoogleTokenException;
+use App\Domain\User\GoogleIdentity;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -201,4 +204,33 @@ function aPantry(string $ownerId, string $name = 'Minha despensa'): PantryOutput
 function aPantryMember(string $pantryId, string $ownerId, string $inviteeUsername): void
 {
     app(InvitePantryMember::class)($pantryId, $ownerId, $inviteeUsername);
+}
+
+function aGoogleIdentity(?string $googleId = null, ?string $email = null, string $name = 'Google User'): GoogleIdentity
+{
+    return new GoogleIdentity($googleId ?? (string) Ulid::generate(), $email, $name);
+}
+
+function fakeGoogleVerifier(GoogleIdentity $identity): void
+{
+    app()->instance(GoogleIdTokenVerifierInterface::class, new class($identity) implements GoogleIdTokenVerifierInterface
+    {
+        public function __construct(private GoogleIdentity $identity) {}
+
+        public function verify(string $idToken): GoogleIdentity
+        {
+            return $this->identity;
+        }
+    });
+}
+
+function fakeInvalidGoogleVerifier(): void
+{
+    app()->instance(GoogleIdTokenVerifierInterface::class, new class implements GoogleIdTokenVerifierInterface
+    {
+        public function verify(string $idToken): GoogleIdentity
+        {
+            throw InvalidGoogleTokenException::create();
+        }
+    });
 }
