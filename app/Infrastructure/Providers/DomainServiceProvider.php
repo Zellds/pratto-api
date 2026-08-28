@@ -15,7 +15,9 @@ use App\Domain\Pantry\Contracts\PantryRepositoryInterface;
 use App\Domain\Rating\Contracts\RatingRepositoryInterface;
 use App\Domain\Recipe\Contracts\RecipeRepositoryInterface;
 use App\Domain\User\Contracts\AccessTokenIssuerInterface;
+use App\Domain\User\Contracts\GoogleIdTokenVerifierInterface;
 use App\Domain\User\Contracts\UserRepositoryInterface;
+use App\Infrastructure\Auth\GoogleApiClientIdTokenVerifier;
 use App\Infrastructure\Auth\SanctumAccessTokenIssuer;
 use App\Infrastructure\Media\ImagePipeline;
 use App\Infrastructure\Media\TemporaryMediaUrlSigner;
@@ -40,6 +42,7 @@ final class DomainServiceProvider extends ServiceProvider
     {
         $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
         $this->app->bind(AccessTokenIssuerInterface::class, SanctumAccessTokenIssuer::class);
+        $this->app->bind(GoogleIdTokenVerifierInterface::class, GoogleApiClientIdTokenVerifier::class);
         $this->app->bind(IngredientRepositoryInterface::class, EloquentIngredientRepository::class);
         $this->app->bind(RecipeRepositoryInterface::class, EloquentRecipeRepository::class);
         $this->app->bind(MediaRepositoryInterface::class, EloquentMediaRepository::class);
