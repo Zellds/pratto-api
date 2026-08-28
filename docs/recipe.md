@@ -6,8 +6,10 @@ Uma `Recipe` (receita) pertence a um dono (`ownerId`, um `User`) e descreve um p
 título, descrição, número de porções, tempo de preparo, uma lista de ingredientes
 (quantidade + unidade de medida + posição) e uma lista de passos (instrução +
 posição). Toda receita nasce em rascunho e passa por um ciclo de vida curto antes
-de ficar publicamente visível — hoje esse ciclo tem só o primeiro degrau
-implementado (enviar para revisão); a aprovação final ainda não existe via API.
+de ficar publicamente visível — enviar para revisão (`publish()`) e a aprovação
+ou rejeição de fato (`approve()`/`reject()`, via `PATCH /recipes/{id}/approve`
+e `PATCH /recipes/{id}/reject`, ver [docs/moderation.md](./moderation.md)) já
+existem via API.
 
 Código-fonte de referência: `app/Domain/Recipe/Recipe.php`,
 `app/Domain/Recipe/RecipeStatus.php`, `app/Domain/Recipe/RecipeIngredient.php`,
@@ -27,8 +29,8 @@ listagem de comentários de uma receita (ver [docs/comment.md](./comment.md)).
 |---|---|---|
 | Draft | `draft` | Estado inicial, ao criar. Também é para onde a receita volta sempre que é atualizada (`update()`), mesmo que estivesse em `pending_review`. |
 | PendingReview | `pending_review` | Depois que o dono chama `publish()` num rascunho. |
-| Published | `published` | Reservado para um fluxo de moderação/aprovação futuro. Nenhum caso de uso hoje leva uma receita a este estado — não existe endpoint que faça essa transição. |
-| Rejected | `rejected` | Reservado do mesmo jeito, para um fluxo de moderação que rejeita a receita. Também não é atingível hoje. |
+| Published | `published` | Depois que um admin chama `approve()` numa receita (`PATCH /recipes/{id}/approve`). Note que `pending_review` já era público antes disso — ver [Regras de visibilidade](#regras-de-visibilidade) e [docs/moderation.md](./moderation.md) para o porquê de `approve`/`reject` não serem "torná-la visível". |
+| Rejected | `rejected` | Depois que um admin chama `reject()` numa receita (`PATCH /recipes/{id}/reject`, com motivo obrigatório). Esconde a receita de todo mundo menos o dono e marca `wasEverRejected = true` permanentemente (ver [Regras de visibilidade](#regras-de-visibilidade)). |
 
 A única transição implementada é `Draft → PendingReview`, via `Recipe::publish()`:
 
@@ -62,8 +64,18 @@ revisão do zero.
 
 `Recipe::isVisibleTo(?Ulid $viewerId): bool` decide se um visitante enxerga a receita:
 
-- Se o status é `pending_review` ou `published`, **qualquer um** enxerga (autenticado ou não).
-- Caso contrário (`draft` ou `rejected`), só o dono enxerga.
+- O dono **sempre** enxerga a própria receita, qualquer que seja o status.
+- Para quem não é dono: `published` é sempre visível; `pending_review` só é
+  visível se `wasEverRejected === false`; `draft` e `rejected` nunca são
+  visíveis.
+
+Ou seja, `pending_review` não é incondicionalmente público — a flag
+`wasEverRejected` fecha um loophole de reenvio: uma receita que já foi
+rejeitada alguma vez continua escondida de quem não é dono mesmo depois de
+voltar para `pending_review` (via `update()` + `publish()`), até que um admin
+a aprove de verdade (`approve()`). O porquê dessa regra e como ela também
+precisa valer nos filtros SQL de busca/feed (não só aqui) está detalhado em
+[docs/moderation.md](./moderation.md#o-loophole-de-reposting-e-por-que-waseverrejected-existe).
 
 Isso vale tanto para leitura individual (`GET /recipes/{id}`) quanto para a
 listagem pública (`GET /recipes` sem `?mine`).

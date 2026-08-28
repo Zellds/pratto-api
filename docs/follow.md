@@ -99,7 +99,13 @@ para quem não segue ninguém. Caso contrário, chama
 $records = EloquentRecipe::query()
     ->with(['ingredients', 'steps'])
     ->whereIn('user_id', array_map(static fn (Ulid $id) => $id->value(), $ownerIds))
-    ->whereIn('status', [RecipeStatus::PendingReview->value, RecipeStatus::Published->value])
+    ->where(function ($publicQuery) {
+        $publicQuery->where('status', RecipeStatus::Published->value)
+            ->orWhere(function ($pendingQuery) {
+                $pendingQuery->where('status', RecipeStatus::PendingReview->value)
+                    ->where('was_ever_rejected', false);
+            });
+    })
     ->orderByDesc('created_at')
     ->forPage($page, $perPage)
     ->get();
@@ -107,11 +113,15 @@ $records = EloquentRecipe::query()
 
 Isso é **exatamente** a mesma regra pública que `SearchRecipes` aplica em
 `GET /recipes` sem `?mine`
-(ver [docs/recipe.md](./recipe.md#o-filtro-mine-em-get-recipes)): só
-`pending_review`/`published` aparecem, nunca `draft`/`rejected` — mesmo que a
-receita seja de alguém que você segue. O feed não tem um conceito de "veja
+(ver [docs/recipe.md](./recipe.md#o-filtro-mine-em-get-recipes)): `published`
+sempre aparece, `pending_review` só aparece se a receita nunca foi rejeitada
+(`was_ever_rejected = false`), e `draft`/`rejected` nunca aparecem — mesmo que
+a receita seja de alguém que você segue. O feed não tem um conceito de "veja
 os rascunhos de quem eu sigo"; ele é estritamente "conteúdo publicamente
-visível, filtrado pelo grafo de quem eu sigo".
+visível, filtrado pelo grafo de quem eu sigo". O porquê desse filtro (e não o
+antigo `whereIn(['pending_review', 'published'])` simples) é o mesmo loophole
+de reposting fechado pelo Plano de Moderation — ver
+[docs/moderation.md](./moderation.md#o-loophole-de-reposting-e-por-que-waseverrejected-existe).
 
 Como em `SearchRecipes`, o agregado de rating (`averageRating`/
 `ratingsCount`) é calculado numa única query em lote via
@@ -119,25 +129,30 @@ Como em `SearchRecipes`, o agregado de rating (`averageRating`/
 query de agregação por página do feed, não uma por receita
 (ver [docs/rating.md](./rating.md#como-a-agregação-averagerating-ratingscount-é-calculada-e-exposta)).
 
-### Limitação documentada: não existe aprovação real de `pending_review → published` (ainda)
+### Aprovação real de `pending_review → published` já existe (Plano de Moderation)
 
-**Isto é esperado, não é um bug deste plano.** Hoje, o sistema não tem
-nenhum mecanismo real de moderação/aprovação — a transição
-`pending_review → published` só vai existir a partir do Plano de Moderation
-(ver roadmap do domínio). Até lá, `pending_review` e `published` são tratados
-de forma idêntica por toda regra de visibilidade pública do sistema,
-incluindo esta: `SearchRecipes` (`GET /recipes`), `GetRecipe`
-(`GET /recipes/{id}`) e agora `GetFeed` (`GET /feed`) tratam os dois status
-como igualmente "públicos".
+A transição `pending_review → published` agora existe de fato:
+`PATCH /recipes/{id}/approve` (admin) chama `Recipe::approve()`. O que **não**
+muda é o fato de que `pending_review` já era público antes da aprovação —
+aprovar uma receita não é "torná-la visível pela primeira vez", é um admin
+confirmando que o conteúdo está de acordo. `SearchRecipes` (`GET /recipes`),
+`GetRecipe` (`GET /recipes/{id}`) e `GetFeed` (`GET /feed`) continuam tratando
+`pending_review` e `published` como igualmente públicos — com uma exceção:
+uma receita `pending_review` que já foi rejeitada alguma vez
+(`wasEverRejected === true`) fica escondida de quem não é dono até um admin
+aprová-la explicitamente. Ver
+[docs/moderation.md](./moderation.md#o-loophole-de-reposting-e-por-que-waseverrejected-existe)
+para o porquê dessa flag existir e
+[docs/recipe.md](./recipe.md#regras-de-visibilidade) para a regra completa de
+`isVisibleTo()`.
 
-Na prática, isso significa que a busca pública e o feed **incluem hoje
-receitas que tecnicamente ainda não passaram por nenhuma aprovação de
-verdade** — qualquer receita que o dono publicou (`POST
-/recipes/{id}/publish`, que só move `draft → pending_review`) já aparece para
-todo mundo, inclusive no feed de quem o segue, antes de qualquer revisão
-humana ou automática existir. Isso não é uma falha desta implementação: é o
-estado esperado do sistema até o Plano de Moderation introduzir uma
-aprovação real e, possivelmente, uma transição adicional de status.
+Na prática, isso significa que a busca pública e o feed continuam incluindo
+receitas que ainda não passaram por revisão humana — qualquer receita que o
+dono publicou (`POST /recipes/{id}/publish`, que só move `draft →
+pending_review`) já aparece para todo mundo, inclusive no feed de quem o
+segue, antes de qualquer aprovação explícita. Isso continua sendo o
+comportamento esperado do sistema: moderação é reativa (rejeitar o que for
+denunciado ou notado), não um gate bloqueante antes da publicação.
 
 ## Exclusões deliberadas de escopo
 

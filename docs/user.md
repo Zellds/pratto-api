@@ -157,6 +157,72 @@ problema perceptível, já que um usuário novo realmente tem `0`/`0` — a
 inconsistência só aparece em `PATCH /me` de um usuário que já tinha
 seguidores antes de editar o perfil.
 
+## `role`, `status` e banimento (Plano de Moderation)
+
+Além dos campos já descritos acima, `User` guarda estado de moderação: um
+papel (`role`) e um estado de conta (`status`), com banimento/desbanimento
+como as ações que mudam o `status`.
+
+- `role` (`app/Domain/User/Enums/UserRole.php`): `user` (padrão) ou `admin`.
+  `admin` é o que o middleware `EnsureUserIsAdmin` exige para os endpoints de
+  moderação (`/recipes/{id}/approve|reject`, `/ingredients/{id}/approve|reject`,
+  `/users/{username}/promote|ban|unban`, `GET`/`PATCH /reports`...) — ver
+  [docs/moderation.md](./moderation.md#endpoints-http).
+- `status` (`app/Domain/User/Enums/UserStatus.php`): `active` (padrão) ou
+  `banned`.
+
+**Ban/unban não guardam histórico** — `User::ban(Ulid $bannedBy, string
+$reason)`/`unban()` sobrescrevem o estado de banimento vigente
+(`bannedAt`/`banReason`/`bannedBy`); não existe uma tabela separada
+registrando banimentos passados. Banir também **revoga imediatamente todos
+os tokens de acesso já emitidos** para aquele usuário
+(`AccessTokenIssuerInterface::revokeAllFor()`) — uma sessão já aberta para de
+funcionar na próxima requisição, sem esperar expiração ou logout. Um usuário
+banido que tenta logar de novo recebe `403` com o motivo do banimento
+(`POST /login` → `UserBannedException` → `{"message": "Account banned:
+<reason>"}`), em vez do `422` genérico de credenciais inválidas.
+
+O detalhamento completo (por que não há histórico, o loophole de reposting
+de receita que motivou parte deste plano, o desacoplamento de `Report` da
+ação de moderação em si) está em [docs/moderation.md](./moderation.md).
+
+### Endpoints de moderação de usuário (admin)
+
+| Método | Rota | Auth | Corpo | Sucesso | Erros |
+|---|---|---|---|---|---|
+| PATCH | `/users/{username}/promote` | `auth:sanctum` + `admin` | — | `200` — perfil com `role` `admin` | `401` sem autenticação · `403` se não é admin · `404` se o username não existe |
+| PATCH | `/users/{username}/ban` | `auth:sanctum` + `admin` | `{ "reason": "texto" }` (obrigatório) | `200` — perfil com `status` `banned` | `401` sem autenticação · `403` se não é admin · `404` se o username não existe · `422` em validação |
+| PATCH | `/users/{username}/unban` | `auth:sanctum` + `admin` | — | `200` — perfil com `status` `active` | `401` sem autenticação · `403` se não é admin · `404` se o username não existe |
+
+Todos os três respondem com `UserProfileResource` — que **não** expõe
+`role`/`status`/dados de banimento no corpo JSON (só `id`, `username`,
+`displayName`, `bio`, `avatarMediaId`, `followersCount`, `followingCount`,
+ver [Forma da resposta](#forma-da-resposta-userprofileresource) abaixo); a
+mudança de papel/status precisa ser conferida no banco ou inferida
+indiretamente (por exemplo, tentando logar como o usuário banido).
+
+### Bootstrap do primeiro admin: `php artisan user:promote`
+
+Não existe (de propósito) um endpoint HTTP para criar o **primeiro** admin —
+isso permitiria qualquer usuário comum se autopromover. O primeiro admin
+nasce via linha de comando, direto no servidor:
+
+```bash
+php artisan user:promote {username}
+```
+
+Depois que existe pelo menos um admin, promoções seguintes usam o endpoint
+HTTP acima normalmente. Como recuperação para o caso de um único admin ficar
+banido (por si mesmo ou por outro admin) sem ninguém autenticado para
+desbanir via API, existe o comando simétrico:
+
+```bash
+php artisan user:unban {username}
+```
+
+Ver `app/Console/Commands/PromoteUserToAdminCommand.php` e
+`app/Console/Commands/UnbanUserCommand.php`.
+
 ## Referência de endpoints (perfil)
 
 Todas as rotas estão em `routes/api.php`, prefixadas por `/api`. Para os

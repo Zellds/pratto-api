@@ -47,9 +47,20 @@ anti-enumeração: se o comentário existe mas não é seu, você recebe 403,
 porque o comentário já foi carregado do repositório antes da checagem de
 posse).
 
-Não existe moderação de comentário por parte do dono da receita nem por
-administrador nesta versão — a única forma de um comentário sumir é o
-próprio autor apagá-lo.
+Não existe moderação de comentário por parte do dono da receita — isso
+continua verdade mesmo depois do Plano de Moderation: ser dono da receita
+comentada nunca dá poder sobre o comentário de outra pessoa.
+
+Um **administrador**, porém, agora pode apagar qualquer comentário: o mesmo
+`DELETE /comments/{comment}` que o autor usa também aceita um admin, sem
+checagem de posse. `CommentController::destroy()` decide qual caso de uso
+chamar conforme o papel de quem pede — `AdminDeleteComment`
+(`app/Application/Comment/UseCases/AdminDeleteComment.php`, sem
+`assertOwnedBy()`) para admin, `DeleteComment` (com a checagem de posse
+normal) para qualquer outro usuário. Um não-admin que tenta apagar um
+comentário alheio continua recebendo `403 Forbidden`, exatamente como antes.
+Ver [docs/moderation.md](./moderation.md) para o restante do domínio de
+moderação.
 
 ## Corpo do comentário: validação em duas camadas
 
@@ -133,7 +144,7 @@ Todas as rotas estão em `routes/api.php`, prefixadas por `/api`.
 | GET | `/recipes/{recipe}/comments` | Pública | — | `page` (inteiro ≥ 1) | `200` — lista de comentários da página (`CommentResource` cada) | `404` se a receita não existe · `422` em `page` inválido |
 | POST | `/recipes/{recipe}/comments` | `auth:sanctum` | `{ "body": "texto" }` (obrigatório, string, máx. 1000) | — | `201` — comentário criado (`CommentResource`) | `401` sem autenticação · `404` se a receita não existe ou não é visível para quem comenta · `422` em validação |
 | PATCH | `/comments/{comment}` | `auth:sanctum` | `{ "body": "texto" }` (obrigatório, string, máx. 1000) | — | `200` — comentário editado, `editedAt` atualizado | `401` sem autenticação · `403` se não é o autor · `404` se o comentário não existe · `422` em validação |
-| DELETE | `/comments/{comment}` | `auth:sanctum` | — | — | `204` — sem corpo | `401` sem autenticação · `403` se não é o autor · `404` se o comentário não existe |
+| DELETE | `/comments/{comment}` | `auth:sanctum` | — | — | `204` — sem corpo | `401` sem autenticação · `403` se não é o autor nem admin · `404` se o comentário não existe |
 
 ### Forma da resposta (`CommentResource`)
 

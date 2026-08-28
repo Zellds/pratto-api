@@ -20,13 +20,24 @@ Código-fonte de referência: `app/Domain/Ingredient/Ingredient.php`,
 
 ## Status e aceitação provisória
 
-`IngredientStatus` (`app/Domain/Ingredient/IngredientStatus.php`) tem dois
-valores:
+`IngredientStatus` (`app/Domain/Ingredient/Enums/IngredientStatus.php`) tem
+três valores:
 
 | Status | Valor | Significado |
 |---|---|---|
 | Provisional | `provisional` | Ingrediente criado automaticamente a partir de um nome digitado por um usuário, ainda não revisado por moderação. |
-| Approved | `approved` | Ingrediente aprovado. Hoje não existe nenhum caso de uso que promova um ingrediente de `provisional` para `approved` — o valor existe no enum e é reconstituído a partir do banco, mas nada na camada de aplicação atual faz essa transição. |
+| Approved | `approved` | Ingrediente aprovado por um admin, via `PATCH /ingredients/{id}/approve` (`Ingredient::approve()`). |
+| Rejected | `rejected` | Ingrediente rejeitado por um admin, via `PATCH /ingredients/{id}/reject` (`Ingredient::reject()`) — por exemplo, um nome duplicado por erro de digitação ou impróprio. |
+
+`Ingredient` é `final readonly class`: `approve()`/`reject()` **devolvem uma
+nova instância** em vez de mutar a existente — quem chama
+(`ApproveIngredient`/`RejectIngredient`,
+`app/Application/Ingredient/UseCases/`) precisa salvar o valor de retorno.
+Como `Media::approve()`/`reject()` e `Recipe::approve()`/`reject()`, essas
+transições não têm guarda de status: podem ser chamadas a partir de qualquer
+estado, permitindo revogar/reaprovar depois do fato. Ver
+[docs/moderation.md](./moderation.md) para o restante do domínio de
+moderação, incluindo o endpoint de denúncia (`POST /reports`).
 
 Quando um usuário cria ou edita uma receita e digita o nome de um ingrediente
 que ainda não existe no catálogo, `Ingredient::createProvisional()` cria um
@@ -109,6 +120,13 @@ elegância".
 Implementado por `IngredientController::index()` →
 `SearchIngredients::__invoke(string $term)` →
 `EloquentIngredientRepository::search()`.
+
+### Endpoints de moderação (admin)
+
+| Método | Rota | Auth | Corpo | Sucesso | Erros |
+|---|---|---|---|---|---|
+| PATCH | `/ingredients/{ingredient}/approve` | `auth:sanctum` + `admin` | — | `200` — ingrediente com status `approved` | `401` sem autenticação · `403` se não é admin · `404` se não existe |
+| PATCH | `/ingredients/{ingredient}/reject` | `auth:sanctum` + `admin` | — | `200` — ingrediente com status `rejected` | `401` sem autenticação · `403` se não é admin · `404` se não existe |
 
 A busca (`EloquentIngredientRepository::search()`) normaliza o termo da mesma
 forma que a deduplicação (`IngredientName::normalize()`) e busca linhas onde:

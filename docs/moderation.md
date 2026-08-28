@@ -131,6 +131,33 @@ repositório certo conforme `targetType`) e que ninguém denuncia a si mesmo
 | `GET` | `/reports?status=` | admin | `status` default `open` |
 | `PATCH` | `/reports/{report}` | admin | `{ "status": "reviewed"\|"dismissed", "note": "..." }` |
 
+## Limitação conhecida: admin não tem leitura de receita já escondida
+
+Uma vez que uma receita é rejeitada (`reject()`, status `rejected`) — ou
+volta a `pending_review` depois de já ter sido rejeitada uma vez
+(`wasEverRejected === true`, ver acima) — `GetRecipe` (`GET /recipes/{id}`) e
+`SearchRecipes` (`GET /recipes`) escondem essa receita de **todo mundo** que
+não seja o dono, **incluindo admins**. `Recipe::isVisibleTo()` não faz
+nenhuma exceção para papel de usuário; ela só compara `viewerId` contra
+`ownerId`.
+
+Na prática, isso significa que um admin resolvendo uma denúncia
+(`Report`) sobre uma receita que o dono reenviou depois de rejeitada não tem
+como dar um `GET` nessa receita para revisá-la antes de decidir — só
+consegue chamar `PATCH /recipes/{id}/approve`/`reject` "às cegas", sem ver o
+conteúdo atual pela API. Na prática hoje isso é contornado consultando o
+banco diretamente ou confiando no que a denúncia (`Report::reason()`) e o
+histórico de contato com o autor relatam, o que está longe de ideal para um
+fluxo de moderação sério.
+
+Isso é uma lacuna real, não um bug do que foi construído neste plano — dar
+a admins um caminho de leitura para conteúdo escondido é uma mudança de
+comportamento em `GetRecipe`/`SearchRecipes`/`isVisibleTo()` que merece seu
+próprio desenho (por exemplo: um parâmetro explícito "ver como admin", ou um
+endpoint de leitura só-para-moderação) em vez de ser encaixada como
+correção lateral aqui. Fica registrada para não ser descoberta por surpresa
+depois — resolver isso é trabalho de um plano futuro.
+
 ## Bootstrap do primeiro admin
 
 Não existe endpoint HTTP pra criar o primeiro admin (seria um jeito de um

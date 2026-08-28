@@ -234,16 +234,19 @@ com validade de 15 minutos a partir do momento da resposta.
 
 ## Limitações conhecidas
 
-- **Não existe rota para promover um usuário a `admin`.** A coluna
-  `users.role` existe (`string`, default `'user'`), e o middleware `admin`
-  (`EnsureUserIsAdmin`) já confere `$user->role === 'admin'` corretamente —
-  mas nenhum caso de uso ou endpoint do Plano 3 altera esse campo. Hoje a
-  promoção só acontece manualmente, direto no banco (ou via
-  `php artisan tinker`, como os testes de feature fazem:
-  `EloquentUser::query()->where(...)->update(['role' => 'admin'])`). Uma
-  área administrativa completa para gerenciar papéis fica para o Plano 4 —
-  até lá, aprovar/rejeitar mídia em produção depende de alguém com acesso
-  direto ao banco promover a própria conta.
+- **Promover um usuário a `admin` já é possível, mas exige um mecanismo de
+  bootstrap.** A coluna `users.role` existe (`string`, default `'user'`), e o
+  middleware `admin` (`EnsureUserIsAdmin`) confere `$user->role === 'admin'`
+  corretamente. O Plano de Moderation acrescentou dois caminhos reais para
+  promover: `php artisan user:promote {username}` (comando de console, sem
+  exigir autenticação — é assim que o **primeiro** admin nasce, direto no
+  servidor) e `PATCH /users/{username}/promote` (HTTP, exige um admin
+  autenticado — só funciona depois que já existe pelo menos um). Ver
+  [docs/moderation.md](./moderation.md#bootstrap-do-primeiro-admin) para o
+  fluxo completo. Promoção manual direto no banco (`UPDATE users SET role =
+  'admin' ...`) **não** é mais a forma esperada de fazer isso — é exatamente
+  o buraco de bootstrap que este mecanismo substituiu; só os testes antigos
+  ainda usavam esse atalho antes deste plano.
 - **Não há endpoint para reobter as URLs assinadas de uma mídia já
   existente.** `GET /media/{id}` não existe. As URLs assinadas só saem nas
   respostas de `POST /media`, `PATCH /media/{id}/focal-point`,
