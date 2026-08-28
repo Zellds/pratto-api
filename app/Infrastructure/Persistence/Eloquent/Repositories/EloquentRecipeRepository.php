@@ -12,6 +12,7 @@ use App\Domain\Shared\Ulid;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentRecipe;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentRecipeIngredient;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentRecipeStep;
+use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 
 final class EloquentRecipeRepository implements RecipeRepositoryInterface
@@ -36,6 +37,10 @@ final class EloquentRecipeRepository implements RecipeRepositoryInterface
                     'prep_time_minutes' => $recipe->prepTimeMinutes(),
                     'status' => $recipe->status()->value,
                     'cover_media_id' => $recipe->coverMediaId()?->value(),
+                    'rejection_reason' => $recipe->rejectionReason(),
+                    'was_ever_rejected' => $recipe->wasEverRejected(),
+                    'reviewed_by' => $recipe->reviewedBy()?->value(),
+                    'reviewed_at' => $recipe->reviewedAt(),
                 ],
             );
 
@@ -73,7 +78,13 @@ final class EloquentRecipeRepository implements RecipeRepositoryInterface
         if ($ownerId !== null) {
             $query->where('user_id', $ownerId->value());
         } else {
-            $query->whereIn('status', [RecipeStatus::PendingReview->value, RecipeStatus::Published->value]);
+            $query->where(function ($publicQuery) {
+                $publicQuery->where('status', RecipeStatus::Published->value)
+                    ->orWhere(function ($pendingQuery) {
+                        $pendingQuery->where('status', RecipeStatus::PendingReview->value)
+                            ->where('was_ever_rejected', false);
+                    });
+            });
         }
 
         if ($term !== null && trim($term) !== '') {
@@ -94,7 +105,13 @@ final class EloquentRecipeRepository implements RecipeRepositoryInterface
         $records = EloquentRecipe::query()
             ->with(['ingredients', 'steps'])
             ->whereIn('user_id', array_map(static fn (Ulid $id) => $id->value(), $ownerIds))
-            ->whereIn('status', [RecipeStatus::PendingReview->value, RecipeStatus::Published->value])
+            ->where(function ($publicQuery) {
+                $publicQuery->where('status', RecipeStatus::Published->value)
+                    ->orWhere(function ($pendingQuery) {
+                        $pendingQuery->where('status', RecipeStatus::PendingReview->value)
+                            ->where('was_ever_rejected', false);
+                    });
+            })
             ->orderByDesc('created_at')
             ->forPage($page, $perPage)
             ->get();
@@ -140,6 +157,10 @@ final class EloquentRecipeRepository implements RecipeRepositoryInterface
             $ingredients,
             $steps,
             $record->cover_media_id !== null ? Ulid::fromString($record->cover_media_id) : null,
+            $record->rejection_reason,
+            (bool) $record->was_ever_rejected,
+            $record->reviewed_by !== null ? Ulid::fromString($record->reviewed_by) : null,
+            $record->reviewed_at !== null ? DateTimeImmutable::createFromInterface($record->reviewed_at) : null,
         );
     }
 }

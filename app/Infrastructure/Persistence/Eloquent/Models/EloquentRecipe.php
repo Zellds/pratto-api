@@ -16,6 +16,12 @@ class EloquentRecipe extends Model
 
     protected $fillable = [
         'id', 'user_id', 'title', 'description', 'portions', 'prep_time_minutes', 'status', 'cover_media_id',
+        'rejection_reason', 'was_ever_rejected', 'reviewed_by', 'reviewed_at',
+    ];
+
+    protected $casts = [
+        'was_ever_rejected' => 'boolean',
+        'reviewed_at' => 'datetime',
     ];
 
     /**

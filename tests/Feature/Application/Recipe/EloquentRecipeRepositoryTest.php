@@ -141,3 +141,64 @@ it('forOwners returns an empty list for an empty owner list', function () {
 
     expect($repository->forOwners([], 1, 20))->toBe([]);
 });
+
+it('persists rejection and review fields, round-tripping them exactly', function () {
+    $repository = app(RecipeRepositoryInterface::class);
+    $reviewer = anOwner();
+    $recipe = Recipe::create(
+        Ulid::generate(), anOwner(), 'Bolo', 'x', 8, 60,
+        [RecipeIngredient::create(anIngredientId(), 1.0, MeasurementUnit::Gram, 0)],
+        [RecipeStep::create(0, 'x')],
+    );
+    $recipe->publish();
+    $recipe->reject($reviewer, 'Foto imprópria.');
+    $repository->save($recipe);
+
+    $found = $repository->findById($recipe->id());
+
+    expect($found->status())->toBe(RecipeStatus::Rejected)
+        ->and($found->rejectionReason())->toBe('Foto imprópria.')
+        ->and($found->wasEverRejected())->toBeTrue()
+        ->and($found->reviewedBy()->equals($reviewer))->toBeTrue()
+        ->and($found->reviewedAt())->toBeInstanceOf(DateTimeImmutable::class);
+});
+
+it('search without an owner excludes a pending_review recipe that was ever rejected, even after resubmission', function () {
+    $repository = app(RecipeRepositoryInterface::class);
+    $owner = anOwner();
+    $recipe = Recipe::create(
+        Ulid::generate(), $owner, 'Receita reincidente', 'x', 8, 60,
+        [RecipeIngredient::create(anIngredientId(), 1.0, MeasurementUnit::Gram, 0)],
+        [RecipeStep::create(0, 'x')],
+    );
+    $recipe->publish();
+    $recipe->reject(anOwner(), 'Motivo.');
+    $recipe->update('Receita reincidente', 'x', 8, 60, [RecipeIngredient::create(anIngredientId(), 1.0, MeasurementUnit::Gram, 0)], [RecipeStep::create(0, 'x')]);
+    $recipe->publish();
+    $repository->save($recipe);
+
+    expect($recipe->status())->toBe(RecipeStatus::PendingReview);
+
+    $results = $repository->search(null, null, 1, 20);
+
+    expect(collect($results)->pluck('id')->map(fn ($id) => $id->value())->contains($recipe->id()->value()))->toBeFalse();
+});
+
+it('forOwners excludes a pending_review recipe that was ever rejected, same as search', function () {
+    $repository = app(RecipeRepositoryInterface::class);
+    $owner = anOwner();
+    $recipe = Recipe::create(
+        Ulid::generate(), $owner, 'Receita reincidente', 'x', 8, 60,
+        [RecipeIngredient::create(anIngredientId(), 1.0, MeasurementUnit::Gram, 0)],
+        [RecipeStep::create(0, 'x')],
+    );
+    $recipe->publish();
+    $recipe->reject(anOwner(), 'Motivo.');
+    $recipe->update('Receita reincidente', 'x', 8, 60, [RecipeIngredient::create(anIngredientId(), 1.0, MeasurementUnit::Gram, 0)], [RecipeStep::create(0, 'x')]);
+    $recipe->publish();
+    $repository->save($recipe);
+
+    $results = $repository->forOwners([$owner], 1, 20);
+
+    expect($results)->toBeEmpty();
+});
