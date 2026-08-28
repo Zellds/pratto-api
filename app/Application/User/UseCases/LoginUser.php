@@ -7,6 +7,7 @@ use App\Application\User\DTOs\LoginUserOutput;
 use App\Domain\User\Contracts\AccessTokenIssuerInterface;
 use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Domain\User\Exceptions\InvalidCredentialsException;
+use App\Domain\User\Exceptions\UserBannedException;
 use App\Domain\User\Username;
 use InvalidArgumentException;
 
@@ -29,6 +30,10 @@ final readonly class LoginUser
 
         if ($user === null) {
             throw InvalidCredentialsException::create();
+        }
+
+        if ($user->isBanned()) {
+            throw UserBannedException::forReason($user->banReason());
         }
 
         return new LoginUserOutput($this->tokens->issueFor($user->id()));

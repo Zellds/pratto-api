@@ -1,5 +1,6 @@
 <?php
 
+use App\Application\User\UseCases\BanUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -46,4 +47,18 @@ it('logs out and invalidates the token', function () {
 
     $me = $this->withHeader('Authorization', "Bearer {$token}")->getJson('/api/me');
     $me->assertStatus(401);
+});
+
+it('rejects login for a banned user with the ban reason', function () {
+    $admin = anAdmin();
+    $this->postJson('/api/register', [
+        'username' => 'gabriel_banido',
+        'display_name' => 'Gabriel',
+        'password' => 'senha-forte-123',
+    ]);
+    app(BanUser::class)('gabriel_banido', $admin->value(), 'Conteúdo impróprio.');
+
+    $response = $this->postJson('/api/login', ['username' => 'gabriel_banido', 'password' => 'senha-forte-123']);
+
+    $response->assertStatus(403)->assertJsonPath('message', 'Account banned: Conteúdo impróprio.');
 });
