@@ -21,6 +21,7 @@ class RecipeResource extends JsonResource
             'prepTimeMinutes' => $this->resource->prepTimeMinutes,
             'status' => $this->resource->status,
             'coverMediaId' => $this->resource->coverMediaId,
+            'rejectionReason' => $this->resource->rejectionReason,
             'averageRating' => $this->resource->averageRating !== null
                 ? round($this->resource->averageRating, 1)
                 : null,

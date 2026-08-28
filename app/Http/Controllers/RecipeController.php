@@ -6,16 +6,19 @@ use App\Application\Recipe\DTOs\CreateRecipeInput;
 use App\Application\Recipe\DTOs\RecipeIngredientInput;
 use App\Application\Recipe\DTOs\RecipeStepInput;
 use App\Application\Recipe\DTOs\UpdateRecipeInput;
+use App\Application\Recipe\UseCases\ApproveRecipe;
 use App\Application\Recipe\UseCases\CreateRecipe;
 use App\Application\Recipe\UseCases\DeleteRecipe;
 use App\Application\Recipe\UseCases\GetRecipe;
 use App\Application\Recipe\UseCases\PublishRecipe;
+use App\Application\Recipe\UseCases\RejectRecipe;
 use App\Application\Recipe\UseCases\SearchRecipes;
 use App\Application\Recipe\UseCases\UpdateRecipe;
 use App\Domain\Recipe\Exceptions\CoverMediaNotOwnedException;
 use App\Domain\Recipe\Exceptions\InvalidRecipeStatusTransitionException;
 use App\Domain\Recipe\Exceptions\RecipeNotFoundException;
 use App\Domain\Recipe\Exceptions\RecipeNotOwnedException;
+use App\Http\Requests\RejectRecipeRequest;
 use App\Http\Requests\StoreRecipeRequest;
 use App\Http\Requests\UpdateRecipeRequest;
 use App\Http\Resources\RecipeResource;
@@ -82,6 +85,28 @@ class RecipeController extends Controller
             abort(403);
         } catch (InvalidRecipeStatusTransitionException $exception) {
             abort(409, $exception->getMessage());
+        }
+
+        return new RecipeResource($output);
+    }
+
+    public function approve(Request $request, string $recipe, ApproveRecipe $approveRecipe): RecipeResource
+    {
+        try {
+            $output = $approveRecipe($recipe, $request->user()->id);
+        } catch (RecipeNotFoundException) {
+            abort(404);
+        }
+
+        return new RecipeResource($output);
+    }
+
+    public function reject(RejectRecipeRequest $request, string $recipe, RejectRecipe $rejectRecipe): RecipeResource
+    {
+        try {
+            $output = $rejectRecipe($recipe, $request->user()->id, $request->string('reason')->value());
+        } catch (RecipeNotFoundException) {
+            abort(404);
         }
 
         return new RecipeResource($output);

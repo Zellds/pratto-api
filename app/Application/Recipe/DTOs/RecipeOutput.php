@@ -28,6 +28,7 @@ final readonly class RecipeOutput
         public ?string $coverMediaId,
         public ?float $averageRating = null,
         public int $ratingsCount = 0,
+        public ?string $rejectionReason = null,
     ) {}
 
     public static function fromDomain(Recipe $recipe, ?int $requestedPortions = null): self
@@ -58,6 +59,9 @@ final readonly class RecipeOutput
             $ingredients,
             $steps,
             $recipe->coverMediaId()?->value(),
+            null,
+            0,
+            $recipe->rejectionReason(),
         );
     }
 
@@ -76,6 +80,7 @@ final readonly class RecipeOutput
             $this->coverMediaId,
             $averageRating,
             $ratingsCount,
+            $this->rejectionReason,
         );
     }
 }
