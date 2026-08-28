@@ -119,3 +119,18 @@ it('returns 404 listing comments for a non-existent recipe', function () {
 
     $response->assertStatus(404);
 });
+
+it('lets an admin delete any comment, even one they do not own', function () {
+    $ownerId = anOwner()->value();
+    $recipe = createAPendingReviewRecipe($ownerId);
+    $authorToken = authenticatedTokenFor($this, 'moderated_author');
+    $commentId = $this->withToken($authorToken)->postJson("/api/recipes/{$recipe->id}/comments", ['body' => 'Impróprio.'])->json('id');
+
+    $adminToken = authenticatedTokenFor($this, 'comment_admin');
+    EloquentUser::query()->where('username', 'comment_admin')->update(['role' => 'admin']);
+    $this->app['auth']->forgetGuards();
+
+    $response = $this->withToken($adminToken)->deleteJson("/api/comments/{$commentId}");
+
+    $response->assertNoContent();
+});

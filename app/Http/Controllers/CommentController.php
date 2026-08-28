@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Application\Comment\UseCases\AdminDeleteComment;
 use App\Application\Comment\UseCases\DeleteComment;
 use App\Application\Comment\UseCases\EditComment;
 use App\Application\Comment\UseCases\ListComments;
@@ -43,10 +44,14 @@ class CommentController extends Controller
         return new CommentResource($output);
     }
 
-    public function destroy(Request $request, string $comment, DeleteComment $deleteComment): Response
+    public function destroy(Request $request, string $comment, DeleteComment $deleteComment, AdminDeleteComment $adminDeleteComment): Response
     {
         try {
-            $deleteComment($comment, $request->user()->id);
+            if ($request->user()->role === 'admin') {
+                $adminDeleteComment($comment);
+            } else {
+                $deleteComment($comment, $request->user()->id);
+            }
         } catch (CommentNotFoundException) {
             abort(404);
         } catch (CommentNotOwnedException) {
