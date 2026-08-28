@@ -23,6 +23,16 @@ final readonly class Ingredient
         return new self($id, $name, $status);
     }
 
+    public function approve(): self
+    {
+        return new self($this->id, $this->name, IngredientStatus::Approved);
+    }
+
+    public function reject(): self
+    {
+        return new self($this->id, $this->name, IngredientStatus::Rejected);
+    }
+
     public function id(): Ulid
     {
         return $this->id;

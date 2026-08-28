@@ -6,4 +6,5 @@ enum IngredientStatus: string
 {
     case Provisional = 'provisional';
     case Approved = 'approved';
+    case Rejected = 'rejected';
 }
