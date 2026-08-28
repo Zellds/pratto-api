@@ -17,6 +17,6 @@ final readonly class ListReports
     {
         $reports = $this->reports->forStatus(ReportStatus::from($status));
 
-        return array_map(static fn ($report) => ReportOutput::fromDomain($report), $reports);
+        return array_map(ReportOutput::fromDomain(...), $reports);
     }
 }

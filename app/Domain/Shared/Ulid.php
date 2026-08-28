@@ -4,7 +4,7 @@ namespace App\Domain\Shared;
 
 use Symfony\Component\Uid\Ulid as SymfonyUlid;
 
-final readonly class Ulid
+final readonly class Ulid implements \Stringable
 {
     private function __construct(private string $value) {}
 

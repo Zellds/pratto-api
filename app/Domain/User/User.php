@@ -8,6 +8,9 @@ use App\Domain\User\Enums\UserStatus;
 use DateTimeImmutable;
 use InvalidArgumentException;
 
+/**
+ * @SuppressWarnings("PHPMD.TooManyPublicMethods")
+ */
 final class User
 {
     private ?string $bio = null;

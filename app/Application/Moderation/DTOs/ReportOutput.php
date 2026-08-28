@@ -4,6 +4,9 @@ namespace App\Application\Moderation\DTOs;
 
 use App\Domain\Moderation\Report;
 
+/**
+ * @SuppressWarnings("PHPMD.ExcessiveParameterList")
+ */
 final readonly class ReportOutput
 {
     public function __construct(

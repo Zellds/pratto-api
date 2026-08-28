@@ -13,6 +13,9 @@ use InvalidArgumentException;
  * action taken as a result (rejecting a recipe, banning a user, deleting
  * a comment) is a separate, unrelated use case — resolving a report only
  * records that an admin looked at it and what they decided.
+ *
+ * @SuppressWarnings("PHPMD.TooManyPublicMethods")
+ * @SuppressWarnings("PHPMD.ExcessiveParameterList")
  */
 final class Report
 {
