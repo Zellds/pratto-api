@@ -14,4 +14,9 @@ final class SanctumAccessTokenIssuer implements AccessTokenIssuerInterface
 
         return $record->createToken('api')->plainTextToken;
     }
+
+    public function revokeAllFor(Ulid $id): void
+    {
+        EloquentUser::query()->findOrFail($id->value())->tokens()->delete();
+    }
 }

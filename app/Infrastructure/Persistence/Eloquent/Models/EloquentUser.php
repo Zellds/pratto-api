@@ -23,6 +23,13 @@ class EloquentUser extends Authenticatable
         'theme',
         'role',
         'status',
+        'banned_at',
+        'ban_reason',
+        'banned_by',
+    ];
+
+    protected $casts = [
+        'banned_at' => 'datetime',
     ];
 
     protected $hidden = [

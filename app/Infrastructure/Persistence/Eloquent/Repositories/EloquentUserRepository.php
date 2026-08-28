@@ -5,10 +5,13 @@ namespace App\Infrastructure\Persistence\Eloquent\Repositories;
 use App\Domain\Shared\Ulid;
 use App\Domain\User\Contracts\UserRepositoryInterface;
 use App\Domain\User\DisplayName;
+use App\Domain\User\Enums\UserRole;
+use App\Domain\User\Enums\UserStatus;
 use App\Domain\User\Exceptions\DuplicateUsernameException;
 use App\Domain\User\User;
 use App\Domain\User\Username;
 use App\Infrastructure\Persistence\Eloquent\Models\EloquentUser;
+use DateTimeImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -39,6 +42,11 @@ final class EloquentUserRepository implements UserRepositoryInterface
                 'bio' => $user->bio(),
                 'avatar_media_id' => $user->avatarMediaId()?->value(),
                 'password' => $password,
+                'role' => $user->role()->value,
+                'status' => $user->status()->value,
+                'banned_at' => $user->bannedAt(),
+                'ban_reason' => $user->banReason(),
+                'banned_by' => $user->bannedBy()?->value(),
             ],
         );
     }
@@ -115,6 +123,14 @@ final class EloquentUserRepository implements UserRepositoryInterface
         if ($record->avatar_media_id !== null) {
             $user->updateAvatar(Ulid::fromString($record->avatar_media_id));
         }
+
+        $user->restoreModerationState(
+            UserRole::from($record->role),
+            UserStatus::from($record->status),
+            $record->banned_at !== null ? DateTimeImmutable::createFromInterface($record->banned_at) : null,
+            $record->ban_reason,
+            $record->banned_by !== null ? Ulid::fromString($record->banned_by) : null,
+        );
 
         return $user;
     }
