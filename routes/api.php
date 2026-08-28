@@ -62,5 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/media/{media}/reject', [MediaController::class, 'reject']);
         Route::patch('/recipes/{recipe}/approve', [RecipeController::class, 'approve']);
         Route::patch('/recipes/{recipe}/reject', [RecipeController::class, 'reject']);
+        Route::patch('/ingredients/{ingredient}/approve', [IngredientController::class, 'approve']);
+        Route::patch('/ingredients/{ingredient}/reject', [IngredientController::class, 'reject']);
     });
 });
