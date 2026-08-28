@@ -8,6 +8,7 @@ use App\Domain\Ingredient\Contracts\IngredientRepositoryInterface;
 use App\Domain\Media\Contracts\ImageProcessorInterface;
 use App\Domain\Media\Contracts\MediaRepositoryInterface;
 use App\Domain\Media\Contracts\MediaUrlSignerInterface;
+use App\Domain\Moderation\Contracts\ReportRepositoryInterface;
 use App\Domain\Pantry\Contracts\PantryItemRepositoryInterface;
 use App\Domain\Pantry\Contracts\PantryMembershipRepositoryInterface;
 use App\Domain\Pantry\Contracts\PantryRepositoryInterface;
@@ -27,6 +28,7 @@ use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentPantryMembershi
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentPantryRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentRatingRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentRecipeRepository;
+use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentReportRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
 use Illuminate\Support\ServiceProvider;
 use Intervention\Image\ImageManager;
@@ -47,6 +49,7 @@ final class DomainServiceProvider extends ServiceProvider
         $this->app->bind(PantryRepositoryInterface::class, EloquentPantryRepository::class);
         $this->app->bind(PantryMembershipRepositoryInterface::class, EloquentPantryMembershipRepository::class);
         $this->app->bind(PantryItemRepositoryInterface::class, EloquentPantryItemRepository::class);
+        $this->app->bind(ReportRepositoryInterface::class, EloquentReportRepository::class);
         $this->app->singleton(ImageManager::class, static fn () => ImageManager::gd());
         $this->app->bind(ImageProcessorInterface::class, ImagePipeline::class);
         $this->app->bind(MediaUrlSignerInterface::class, TemporaryMediaUrlSigner::class);
