@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LoginWithGoogleController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -32,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', LogoutController::class);
     Route::get('/me', [UserProfileController::class, 'me']);
     Route::patch('/me', [UserProfileController::class, 'update']);
+    Route::patch('/me/google', [AccountController::class, 'linkGoogle']);
+    Route::patch('/me/password', [AccountController::class, 'setPassword']);
     Route::post('/recipes', [RecipeController::class, 'store']);
     Route::patch('/recipes/{recipe}', [RecipeController::class, 'update']);
     Route::post('/recipes/{recipe}/publish', [RecipeController::class, 'publish']);
