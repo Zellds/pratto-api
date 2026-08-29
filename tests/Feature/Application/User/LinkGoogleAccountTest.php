@@ -1,5 +1,4 @@
 <?php
-// tests/Feature/Application/User/LinkGoogleAccountTest.php
 
 use App\Application\User\UseCases\LinkGoogleAccount;
 use App\Domain\User\Contracts\UserRepositoryInterface;

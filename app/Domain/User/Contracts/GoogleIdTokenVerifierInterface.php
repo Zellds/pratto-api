@@ -12,7 +12,7 @@ interface GoogleIdTokenVerifierInterface
      * expiration, returning the identity it carries.
      *
      * @throws InvalidGoogleTokenException when the token is invalid, expired,
-     *                                      or issued for a different audience.
+     *                                     or issued for a different audience.
      */
     public function verify(string $idToken): GoogleIdentity;
 }

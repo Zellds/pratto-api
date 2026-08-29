@@ -46,6 +46,55 @@ Código-fonte de referência: `app/Domain/User/User.php`,
 Nenhuma dessas regras mudou neste plano; elas são descritas aqui só como pano
 de fundo para as duas seções abaixo.
 
+## Login via Google
+
+Além de usuário/senha, o Pratto aceita login via Google (fluxo de ID token
+do Google Identity Services — o frontend recebe um JWT do próprio
+navegador e manda pro backend, que só verifica a assinatura contra as
+chaves públicas do Google via a lib oficial `google/apiclient`).
+
+- `POST /login/google` (público, `{ "id_token": "..." }`) — primeiro
+  login cria a conta na hora, com um `username` gerado automaticamente a
+  partir do nome/e-mail do Google (resolve colisão com sufixo numérico);
+  logins seguintes com o mesmo `google_id` autenticam a conta existente,
+  sem duplicar. Mesmo formato de resposta de `POST /login`
+  (`{ "token": "..." }"`). Bloqueia usuário banido (`403`, mesma
+  `UserBannedException` do login por senha).
+- Uma conta que nasceu via Google não tem senha usável até o dono definir
+  uma explicitamente — `PATCH /me/password` (autenticado,
+  `{ "password": "..." }`, mínimo 8 caracteres) define ou troca a senha
+  local, habilitando login híbrido (usuário/senha **e** Google, os dois
+  válidos ao mesmo tempo).
+- Vincular uma conta Google a uma conta usuário/senha já existente é
+  sempre manual, de dentro do perfil — `PATCH /me/google` (autenticado,
+  `{ "id_token": "..." }`). Nunca automático por e-mail batendo, mesmo se
+  o e-mail do Google coincidir com um já cadastrado — decisão de
+  segurança: vincular automaticamente por e-mail abriria uma forma de
+  sequestrar uma conta existente só tendo acesso (mesmo que temporário) à
+  caixa de e-mail associada.
+- `google_id`/`email` ficam só na Infrastructure (colunas em `users`),
+  igual senha — nunca entram no agregado de domínio `User`. `email` é só
+  metadado vindo do Google hoje, sem nenhum uso funcional (sem
+  verificação, sem reset de senha por e-mail).
+- Erros: `422` token do Google inválido/expirado ou senha fora da regra
+  mínima; `409` `google_id` já vinculado a outra conta; `403` usuário
+  banido; `401` sem autenticação nas rotas de `/me/*`.
+
+### Configuração (Google Cloud Console)
+
+Pra rodar de verdade contra o Google real (os testes automatizados usam
+uma fake, não precisam disso), alguém com acesso ao Google Cloud precisa:
+
+1. Criar um projeto no [Google Cloud Console](https://console.cloud.google.com/).
+2. Configurar a tela de consentimento OAuth (nome do app, e-mail de suporte).
+3. Criar uma credencial "OAuth 2.0 Client ID" do tipo "Web application",
+   com as origens autorizadas (`http://localhost:5173` em dev, o domínio
+   de produção quando existir).
+4. Colocar o Client ID gerado na variável de ambiente
+   `GOOGLE_OAUTH_CLIENT_ID` (backend, valida a audiência do token) — o
+   Plano 9 (frontend) vai precisar do mesmo Client ID pra inicializar o
+   botão "Sign in with Google".
+
 ## `GET /users/{username}`: perfil público (novidade deste plano)
 
 Rota pública, sem autenticação (`routes/api.php`, fora do grupo

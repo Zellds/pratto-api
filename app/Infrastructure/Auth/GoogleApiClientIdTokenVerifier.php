@@ -1,5 +1,4 @@
 <?php
-// app/Infrastructure/Auth/GoogleApiClientIdTokenVerifier.php
 
 namespace App\Infrastructure\Auth;
 
