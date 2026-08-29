@@ -167,8 +167,28 @@ it('links a google id to an existing user', function () {
     $repository = app(UserRepositoryInterface::class);
     $owner = anOwner();
 
-    $repository->linkGoogleId($owner, 'link-google-id');
+    $repository->linkGoogleId($owner, 'link-google-id', null);
 
     $found = $repository->findByGoogleId('link-google-id');
     expect($found->id()->equals($owner))->toBeTrue();
+});
+
+it('persists the email when linking a google id to an existing user', function () {
+    $repository = app(UserRepositoryInterface::class);
+    $owner = anOwner();
+
+    $repository->linkGoogleId($owner, 'link-google-id-email', 'someone@example.com');
+
+    $record = EloquentUserModel::query()->find($owner->value());
+    expect($record->email)->toBe('someone@example.com');
+});
+
+it('throws GoogleAccountAlreadyLinkedException instead of a raw DB error when linking a google id already linked to another user', function () {
+    $repository = app(UserRepositoryInterface::class);
+    $ownerA = anOwner();
+    $ownerB = anOwner();
+    $repository->linkGoogleId($ownerA, 'race-link-google-id', null);
+
+    expect(fn () => $repository->linkGoogleId($ownerB, 'race-link-google-id', null))
+        ->toThrow(GoogleAccountAlreadyLinkedException::class);
 });

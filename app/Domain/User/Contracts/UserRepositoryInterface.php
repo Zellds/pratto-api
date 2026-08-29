@@ -58,7 +58,13 @@ interface UserRepositoryInterface
     public function registerWithGoogle(User $user, string $googleId, ?string $email): void;
 
     /**
-     * Links the given Google id to an already-existing user.
+     * Links the given Google id (and email, when Google provides one) to an
+     * already-existing user.
+     *
+     * @throws GoogleAccountAlreadyLinkedException when the google id is
+     *                                             already linked to another user, including races where a
+     *                                             concurrent link bypasses the check-then-update lookup and
+     *                                             collides on the DB unique constraint.
      */
-    public function linkGoogleId(Ulid $id, string $googleId): void;
+    public function linkGoogleId(Ulid $id, string $googleId, ?string $email): void;
 }

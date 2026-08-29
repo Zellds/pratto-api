@@ -157,9 +157,17 @@ final class EloquentUserRepository implements UserRepositoryInterface
         return $driverMessage !== false ? $driverMessage : $exception->getMessage();
     }
 
-    public function linkGoogleId(Ulid $id, string $googleId): void
+    public function linkGoogleId(Ulid $id, string $googleId, ?string $email): void
     {
-        EloquentUser::query()->whereKey($id->value())->update(['google_id' => $googleId]);
+        try {
+            EloquentUser::query()->whereKey($id->value())->update(['google_id' => $googleId, 'email' => $email]);
+        } catch (QueryException $exception) {
+            if ($this->isUniqueConstraintViolation($exception)) {
+                throw GoogleAccountAlreadyLinkedException::forGoogleId($googleId);
+            }
+
+            throw $exception;
+        }
     }
 
     private function toDomain(EloquentUser $record): User

@@ -25,6 +25,6 @@ final readonly class LinkGoogleAccount
             throw GoogleAccountAlreadyLinkedException::forGoogleId($identity->googleId);
         }
 
-        $this->users->linkGoogleId($id, $identity->googleId);
+        $this->users->linkGoogleId($id, $identity->googleId, $identity->email);
     }
 }
