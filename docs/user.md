@@ -58,7 +58,7 @@ chaves públicas do Google via a lib oficial `google/apiclient`).
   partir do nome/e-mail do Google (resolve colisão com sufixo numérico);
   logins seguintes com o mesmo `google_id` autenticam a conta existente,
   sem duplicar. Mesmo formato de resposta de `POST /login`
-  (`{ "token": "..." }"`). Bloqueia usuário banido (`403`, mesma
+  (`{ "token": "..." }`). Bloqueia usuário banido (`403`, mesma
   `UserBannedException` do login por senha).
 - Uma conta que nasceu via Google não tem senha usável até o dono definir
   uma explicitamente — `PATCH /me/password` (autenticado,

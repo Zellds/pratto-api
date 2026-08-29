@@ -8,6 +8,7 @@ use App\Domain\User\Exceptions\UserBannedException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class LoginWithGoogleController extends Controller
 {
@@ -20,7 +21,7 @@ class LoginWithGoogleController extends Controller
         try {
             $output = $loginWithGoogle($data['id_token']);
         } catch (InvalidGoogleTokenException $exception) {
-            abort(422, $exception->getMessage());
+            throw ValidationException::withMessages(['id_token' => $exception->getMessage()]);
         } catch (UserBannedException $exception) {
             return response()->json(['message' => $exception->getMessage()], 403);
         }

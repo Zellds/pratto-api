@@ -37,5 +37,6 @@ class EloquentUser extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'google_id',
     ];
 }

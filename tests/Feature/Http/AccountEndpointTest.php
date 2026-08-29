@@ -48,3 +48,16 @@ it('rejects a password shorter than 8 characters', function () {
         ->patchJson('/api/me/password', ['password' => 'short'])
         ->assertStatus(422);
 });
+
+it('rejects setting a password without authentication', function () {
+    $this->patchJson('/api/me/password', ['password' => 'nova-senha-longa'])->assertStatus(401);
+});
+
+it('rejects linking an invalid google token', function () {
+    $token = authenticatedToken($this);
+    fakeInvalidGoogleVerifier();
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->patchJson('/api/me/google', ['id_token' => 'bad'])
+        ->assertStatus(422);
+});
