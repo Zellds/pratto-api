@@ -2,13 +2,17 @@
 
 namespace App\Infrastructure\Persistence\Eloquent\Models;
 
+use Database\Factories\RecipeFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EloquentRecipe extends Model
 {
+    use HasFactory;
     use HasUlids;
     use SoftDeletes;
 
@@ -38,5 +42,15 @@ class EloquentRecipe extends Model
     public function steps(): HasMany
     {
         return $this->hasMany(EloquentRecipeStep::class, 'recipe_id')->orderBy('position');
+    }
+
+    /**
+     * The factory class name doesn't match the default `Eloquent{Model}Factory`
+     * convention Laravel would derive from this class's namespace, so it must
+     * be resolved explicitly.
+     */
+    protected static function newFactory(): Factory
+    {
+        return RecipeFactory::new();
     }
 }
