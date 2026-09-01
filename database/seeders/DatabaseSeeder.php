@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
 
         $otherUsers = EloquentUser::factory()->count(5)->create();
 
-        $allUsers = $otherUsers->push($testUser);
+        $allUsers = $otherUsers->concat([$testUser]);
 
         $recipes = collect();
 
