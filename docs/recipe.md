@@ -210,11 +210,16 @@ no domínio `Ingredient`, não no `Recipe`.
 {
   "id": "01J...",
   "ownerId": "01J...",
+  "ownerUsername": "gabriel",
+  "ownerDisplayName": "Gabriel Medeiros",
   "title": "Bolo de cenoura",
   "description": "Bolo simples e rápido",
   "portions": 8,
   "prepTimeMinutes": 60,
   "status": "draft",
+  "coverMediaId": null,
+  "coverThumbnailUrl": null,
+  "coverDisplayUrl": null,
   "ingredients": [
     { "ingredientId": "01J...", "quantity": 3, "unit": "unidade", "position": 0 }
   ],
@@ -223,6 +228,22 @@ no domínio `Ingredient`, não no `Recipe`.
   ]
 }
 ```
+
+`ownerUsername`/`ownerDisplayName` são resolvidos a partir de `ownerId` via
+`UserRepositoryInterface::findById()`, direto dentro de `RecipeResource`
+(`resolveOwner()`); se o usuário dono não for encontrado, os dois campos
+voltam `null` em vez de quebrar a resposta.
+
+`coverThumbnailUrl`/`coverDisplayUrl` são resolvidos a partir de
+`coverMediaId`, também dentro de `RecipeResource` (`resolveCoverUrls()`),
+via `MediaRepositoryInterface::findById()` + `MediaUrlSignerInterface::signedUrlsFor()`.
+Os dois vêm `null` quando: não há capa (`coverMediaId` é `null`), a mídia
+referenciada não é encontrada, ou a mídia existe mas está com
+`status = rejected` (capa reprovada na moderação — ver
+[docs/media.md](./media.md)). Diferente do `coverMediaId` bruto, essas URLs
+são assinadas **na hora**, a cada leitura da receita — não há cache — então
+elas não sofrem da limitação de expiração em 15 minutos que afeta a resposta
+de `POST /media` (ver [docs/media.md](./media.md)).
 
 ## O filtro `?mine` em `GET /recipes`
 

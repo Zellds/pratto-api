@@ -190,13 +190,27 @@ automaticamente (mas note: hoje não existe nenhum endpoint que apague uma
 `Media`, então esse `nullOnDelete()` é defensivo, não exercitado pela API
 atual).
 
-**A resposta de `Recipe`/`User` devolve só o ID, não as URLs**:
-`RecipeResource`/`UserProfileResource` expõem `coverMediaId`/`avatarMediaId`
-como string, não as `thumbnailUrl`/`displayUrl` assinadas. Como não existe
-endpoint `GET /media/{id}`, o único jeito de o cliente obter as URLs
-assinadas de uma mídia já existente é ter guardado a resposta do
-`POST /media` original (cujas URLs expiram em 15 minutos) — ver limitação
-conhecida abaixo.
+**Capa de receita já resolve URL assinada; avatar ainda não**: isso mudou de
+comportamento e hoje é diferente para cada um dos dois consumidores de
+`Media`:
+
+- **Recipe**: `RecipeResource` expõe `coverMediaId` **e** também
+  `coverThumbnailUrl`/`coverDisplayUrl`, resolvidas a cada leitura, dentro do
+  próprio resource (`resolveCoverUrls()`), via
+  `MediaRepositoryInterface::findById()` seguido de
+  `MediaUrlSignerInterface::signedUrlsFor()`. Não há cache — uma URL nova é
+  assinada em toda resposta — então a expiração de 15 minutos das URLs de
+  `POST /media` **não** é um problema para a capa de uma receita: o cliente
+  sempre recebe uma URL fresca junto com a receita, sem precisar guardar a
+  resposta do upload original. Quando não há capa, ou a mídia referenciada
+  não existe, ou está `rejected` (reprovada na moderação), os dois campos
+  voltam `null` (ver [docs/recipe.md](./recipe.md)).
+- **User**: `UserProfileResource` continua expondo só `avatarMediaId` como
+  string — nenhuma `thumbnailUrl`/`displayUrl` assinada é resolvida para o
+  avatar. Como não existe endpoint `GET /media/{id}`, o único jeito de o
+  cliente obter as URLs assinadas do avatar de um usuário é ter guardado a
+  resposta do `POST /media` original daquele avatar (cujas URLs expiram em 15
+  minutos) — ver limitação conhecida abaixo.
 
 ## Referência de endpoints
 
@@ -254,6 +268,14 @@ com validade de 15 minutos a partir do momento da resposta.
   minutos. Um cliente que só guardou `cover_media_id`/`avatar_media_id` (via
   `Recipe`/`User`) e perdeu a resposta original de upload não tem, hoje, como
   recuperar uma URL válida para exibir aquela imagem.
+  **Atualização**: para foto de capa de receita, essa limitação está fechada —
+  `RecipeResource` resolve `coverThumbnailUrl`/`coverDisplayUrl` frescas a
+  cada leitura de `GET /recipes`/`GET /recipes/{id}`, então o cliente nunca
+  precisa ter guardado a resposta de upload original para exibir a capa (ver
+  seção acima). A limitação continua valendo integralmente para
+  `avatarMediaId` (via `User`) e para qualquer cliente que só tenha um ID de
+  `Media` bruto sem uma `Recipe` que o referencie para resolver a URL através
+  dela.
 - **`approve`/`reject` não verificam o status atual antes de agir** — chamar
   `approve` numa mídia já `approved`, ou `reject` numa já `rejected`, não é
   tratado como erro; a ação simplesmente é reaplicada (idempotente na
