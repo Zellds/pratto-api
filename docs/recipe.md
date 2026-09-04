@@ -176,7 +176,7 @@ Usado por `POST /recipes` e `PATCH /recipes/{id}` (validado por
   "portions": 8,
   "prep_time_minutes": 60,
   "ingredients": [
-    { "ingredient_name": "Cenoura", "quantity": 3, "unit": "unidade", "position": 0 }
+    { "ingredient_name": "Cenoura", "quantity": 3, "unit": "unidade", "position": 0, "is_optional": false }
   ],
   "steps": [
     { "position": 0, "instruction": "Bata tudo no liquidificador." }
@@ -196,6 +196,7 @@ Regras de validação:
   - `quantity`: obrigatório, numérico, mínimo 0.01.
   - `unit`: obrigatório, uma das opções de `MeasurementUnit` (`g`, `kg`, `ml`, `l`, `unidade`, `xicara`, `colher_sopa`, `colher_cha`, `pitada`, `a_gosto`).
   - `position`: obrigatório, inteiro, mínimo 0.
+  - `is_optional`: opcional, booleano, default `false` — indica se o ingrediente é dispensável na receita.
 - `steps`: obrigatório, array, mínimo 1 item. Cada item:
   - `position`: obrigatório, inteiro, mínimo 0.
   - `instruction`: obrigatório, string, máx. 1000.
@@ -221,7 +222,7 @@ no domínio `Ingredient`, não no `Recipe`.
   "coverThumbnailUrl": null,
   "coverDisplayUrl": null,
   "ingredients": [
-    { "ingredientId": "01J...", "quantity": 3, "unit": "unidade", "position": 0 }
+    { "ingredientId": "01J...", "quantity": 3, "unit": "unidade", "position": 0, "isOptional": false }
   ],
   "steps": [
     { "position": 0, "instruction": "Bata tudo no liquidificador." }
