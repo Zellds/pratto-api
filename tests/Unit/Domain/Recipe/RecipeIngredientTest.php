@@ -25,3 +25,23 @@ it('scales the quantity by a ratio, keeping everything else', function () {
         ->and($scaled->position())->toBe(3)
         ->and($scaled->ingredientId()->equals($line->ingredientId()))->toBeTrue();
 });
+
+it('defaults isOptional to false when not specified', function () {
+    $line = RecipeIngredient::create(Ulid::generate(), 2.5, MeasurementUnit::Cup, 0);
+
+    expect($line->isOptional())->toBeFalse();
+});
+
+it('accepts isOptional explicitly as true', function () {
+    $line = RecipeIngredient::create(Ulid::generate(), 2.5, MeasurementUnit::Cup, 0, true);
+
+    expect($line->isOptional())->toBeTrue();
+});
+
+it('preserves isOptional when scaled', function () {
+    $line = RecipeIngredient::create(Ulid::generate(), 2.0, MeasurementUnit::Gram, 3, true);
+
+    $scaled = $line->scaledBy(1.5);
+
+    expect($scaled->isOptional())->toBeTrue();
+});

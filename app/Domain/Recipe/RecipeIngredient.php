@@ -13,9 +13,10 @@ final readonly class RecipeIngredient
         private float $quantity,
         private MeasurementUnit $unit,
         private int $position,
+        private bool $isOptional,
     ) {}
 
-    public static function create(Ulid $ingredientId, float $quantity, MeasurementUnit $unit, int $position): self
+    public static function create(Ulid $ingredientId, float $quantity, MeasurementUnit $unit, int $position, bool $isOptional = false): self
     {
         if ($quantity <= 0) {
             throw new InvalidArgumentException('Ingredient quantity must be greater than zero.');
@@ -25,7 +26,7 @@ final readonly class RecipeIngredient
             throw new InvalidArgumentException('Ingredient position cannot be negative.');
         }
 
-        return new self($ingredientId, $quantity, $unit, $position);
+        return new self($ingredientId, $quantity, $unit, $position, $isOptional);
     }
 
     public function ingredientId(): Ulid
@@ -48,8 +49,13 @@ final readonly class RecipeIngredient
         return $this->position;
     }
 
+    public function isOptional(): bool
+    {
+        return $this->isOptional;
+    }
+
     public function scaledBy(float $ratio): self
     {
-        return new self($this->ingredientId, $this->quantity * $ratio, $this->unit, $this->position);
+        return new self($this->ingredientId, $this->quantity * $ratio, $this->unit, $this->position, $this->isOptional);
     }
 }
