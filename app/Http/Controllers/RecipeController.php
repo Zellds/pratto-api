@@ -172,6 +172,7 @@ class RecipeController extends Controller
                 (float) $line['quantity'],
                 $line['unit'],
                 (int) $line['position'],
+                (bool) ($line['is_optional'] ?? false),
             ),
             $request->array('ingredients'),
         );

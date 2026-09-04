@@ -11,5 +11,5 @@ class EloquentRecipeIngredient extends Model
 
     protected $table = 'recipe_ingredients';
 
-    protected $fillable = ['id', 'recipe_id', 'ingredient_id', 'quantity', 'unit', 'position'];
+    protected $fillable = ['id', 'recipe_id', 'ingredient_id', 'quantity', 'unit', 'position', 'is_optional'];
 }

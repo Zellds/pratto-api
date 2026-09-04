@@ -189,3 +189,48 @@ it('rounds averageRating to 1 decimal place on the recipe response', function ()
     // to 1 decimal place at HTTP serialization, so the response shows 4.3.
     $response->assertOk()->assertJsonPath('averageRating', 4.3);
 });
+
+it('round-trips is_optional per ingredient through the API', function () {
+    $token = authenticatedToken($this);
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload([
+            'ingredients' => [
+                ['ingredient_name' => 'Cenoura', 'quantity' => 3, 'unit' => 'unidade', 'position' => 0],
+                ['ingredient_name' => 'Leite', 'quantity' => 1, 'unit' => 'xicara', 'position' => 1, 'is_optional' => true],
+            ],
+        ]));
+
+    $response->assertCreated()
+        ->assertJsonPath('ingredients.0.isOptional', false)
+        ->assertJsonPath('ingredients.1.isOptional', true);
+});
+
+it('defaults is_optional to false when omitted', function () {
+    $token = authenticatedToken($this);
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")->postJson('/api/recipes', recipePayload());
+
+    $response->assertCreated()->assertJsonPath('ingredients.0.isOptional', false);
+});
+
+it('persists is_optional to the database and reloads it correctly on a fresh read', function () {
+    $token = authenticatedToken($this);
+    $recipeId = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload([
+            'ingredients' => [
+                ['ingredient_name' => 'Cenoura', 'quantity' => 3, 'unit' => 'unidade', 'position' => 0],
+                ['ingredient_name' => 'Leite', 'quantity' => 1, 'unit' => 'xicara', 'position' => 1, 'is_optional' => true],
+            ],
+        ]))->json('id');
+
+    // The create response is built from the in-memory domain object (before persisting),
+    // so it doesn't prove the flag survives a save/reload cycle. This GET forces a fresh
+    // read from the database — through the Eloquent model and toDomain() hydration — to
+    // confirm is_optional round-trips correctly in both directions.
+    $response = $this->withHeader('Authorization', "Bearer {$token}")->getJson("/api/recipes/{$recipeId}");
+
+    $response->assertOk()
+        ->assertJsonPath('ingredients.0.isOptional', false)
+        ->assertJsonPath('ingredients.1.isOptional', true);
+});

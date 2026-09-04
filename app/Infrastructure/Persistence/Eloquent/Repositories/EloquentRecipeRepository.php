@@ -51,6 +51,7 @@ final class EloquentRecipeRepository implements RecipeRepositoryInterface
                     'quantity' => $ingredient->quantity(),
                     'unit' => $ingredient->unit()->value,
                     'position' => $ingredient->position(),
+                    'is_optional' => $ingredient->isOptional(),
                 ]);
             }
 
@@ -139,6 +140,7 @@ final class EloquentRecipeRepository implements RecipeRepositoryInterface
             (float) $line->quantity,
             MeasurementUnit::from($line->unit),
             $line->position,
+            (bool) $line->is_optional,
         ))->all();
 
         $steps = $record->steps->map(fn (EloquentRecipeStep $step) => RecipeStep::create(

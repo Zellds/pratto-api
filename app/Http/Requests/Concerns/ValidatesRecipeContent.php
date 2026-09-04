@@ -20,6 +20,7 @@ trait ValidatesRecipeContent
             'ingredients.*.quantity' => ['required', 'numeric', 'min:0.01'],
             'ingredients.*.unit' => ['required', 'string', Rule::in(array_column(MeasurementUnit::cases(), 'value'))],
             'ingredients.*.position' => ['required', 'integer', 'min:0'],
+            'ingredients.*.is_optional' => ['nullable', 'boolean'],
             'steps' => ['required', 'array', 'min:1'],
             'steps.*.position' => ['required', 'integer', 'min:0'],
             'steps.*.instruction' => ['required', 'string', 'max:1000'],

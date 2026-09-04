@@ -44,6 +44,7 @@ class RecipeResource extends JsonResource
                 'quantity' => $ingredient->quantity,
                 'unit' => $ingredient->unit,
                 'position' => $ingredient->position,
+                'isOptional' => $ingredient->isOptional,
             ], $this->resource->ingredients),
             'steps' => array_map(static fn ($step) => [
                 'position' => $step->position,
