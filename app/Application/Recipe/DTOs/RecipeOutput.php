@@ -39,6 +39,7 @@ final readonly class RecipeOutput
                 $ingredient->quantity(),
                 $ingredient->unit()->value,
                 $ingredient->position(),
+                $ingredient->isOptional(),
             ),
             $recipe->scaledIngredients($requestedPortions),
         );

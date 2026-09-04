@@ -35,6 +35,7 @@ final readonly class CreateRecipe
                 $line->quantity,
                 MeasurementUnit::from($line->unit),
                 $line->position,
+                $line->isOptional,
             ),
             $input->ingredients,
         );

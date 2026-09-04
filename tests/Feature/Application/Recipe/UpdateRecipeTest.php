@@ -78,3 +78,17 @@ it('leaves the cover media untouched when the field is not provided', function (
 
     expect($output->coverMediaId)->toBe($cover->id);
 });
+
+it('persists isOptional per ingredient on update', function () {
+    $owner = anOwner();
+    $created = createADraft($owner->value());
+
+    $output = app(UpdateRecipe::class)(new UpdateRecipeInput(
+        $created->id, $owner->value(), 'Bolo atualizado', 'Descrição', 8, 60,
+        [new RecipeIngredientInput(null, 'Leite', 1.0, 'xicara', 0, true)],
+        [new RecipeStepInput(0, 'Misture.')],
+        null, false,
+    ));
+
+    expect($output->ingredients[0]->isOptional)->toBeTrue();
+});

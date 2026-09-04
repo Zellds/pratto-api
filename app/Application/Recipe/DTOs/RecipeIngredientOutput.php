@@ -11,5 +11,6 @@ final readonly class RecipeIngredientOutput
         public float $quantity,
         public string $unit,
         public int $position,
+        public bool $isOptional,
     ) {}
 }

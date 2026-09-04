@@ -69,3 +69,19 @@ it('rejects an avatar-kind media used as a cover', function () {
         $avatar->id,
     ));
 })->throws(CoverMediaNotOwnedException::class);
+
+it('persists isOptional per ingredient, defaulting to false', function () {
+    $owner = anOwner();
+
+    $output = app(CreateRecipe::class)(new CreateRecipeInput(
+        $owner->value(), 'Bolo', 'Bolo simples', 8, 60,
+        [
+            new RecipeIngredientInput(null, 'Cenoura', 3.0, 'unidade', 0),
+            new RecipeIngredientInput(null, 'Leite', 1.0, 'xicara', 1, true),
+        ],
+        [new RecipeStepInput(0, 'Misture.')],
+    ));
+
+    expect($output->ingredients[0]->isOptional)->toBeFalse()
+        ->and($output->ingredients[1]->isOptional)->toBeTrue();
+});

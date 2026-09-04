@@ -44,6 +44,7 @@ final readonly class UpdateRecipe
                 $line->quantity,
                 MeasurementUnit::from($line->unit),
                 $line->position,
+                $line->isOptional,
             ),
             $input->ingredients,
         );
