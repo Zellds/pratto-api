@@ -222,13 +222,18 @@ no domínio `Ingredient`, não no `Recipe`.
   "coverThumbnailUrl": null,
   "coverDisplayUrl": null,
   "ingredients": [
-    { "ingredientId": "01J...", "quantity": 3, "unit": "unidade", "position": 0, "isOptional": false }
+    { "ingredientId": "01J...", "ingredientName": "Cenoura", "quantity": 3, "unit": "unidade", "position": 0, "isOptional": false }
   ],
   "steps": [
     { "position": 0, "instruction": "Bata tudo no liquidificador." }
   ]
 }
 ```
+
+`ingredients[].ingredientName` é o nome de exibição do ingrediente, resolvido
+no servidor (`resolveIngredientNames()`, uma única consulta por receita via
+`IngredientRepositoryInterface::findByIds()`); `null` apenas se o registro do
+ingrediente não existir mais.
 
 `ownerUsername`/`ownerDisplayName` são resolvidos a partir de `ownerId` via
 `UserRepositoryInterface::findById()`, direto dentro de `RecipeResource`

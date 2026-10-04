@@ -234,3 +234,39 @@ it('persists is_optional to the database and reloads it correctly on a fresh rea
         ->assertJsonPath('ingredients.0.isOptional', false)
         ->assertJsonPath('ingredients.1.isOptional', true);
 });
+
+it('returns the ingredient name on each recipe line when reading a recipe back', function () {
+    $token = authenticatedToken($this);
+    $recipeId = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload())->json('id');
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")->getJson("/api/recipes/{$recipeId}");
+
+    $response->assertOk()->assertJsonPath('ingredients.0.ingredientName', 'Cenoura');
+});
+
+it('resolves the right ingredient name for each line and preserves their order', function () {
+    $token = authenticatedToken($this);
+    $recipeId = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/recipes', recipePayload([
+            'ingredients' => [
+                ['ingredient_name' => 'Cenoura', 'quantity' => 3, 'unit' => 'unidade', 'position' => 0],
+                ['ingredient_name' => 'Leite', 'quantity' => 1, 'unit' => 'xicara', 'position' => 1],
+            ],
+        ]))->json('id');
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")->getJson("/api/recipes/{$recipeId}");
+
+    $response->assertOk()
+        ->assertJsonPath('ingredients.0.ingredientName', 'Cenoura')
+        ->assertJsonPath('ingredients.1.ingredientName', 'Leite');
+});
+
+it('returns the ingredient name on the lines of recipes in the list', function () {
+    $token = authenticatedToken($this);
+    $this->withHeader('Authorization', "Bearer {$token}")->postJson('/api/recipes', recipePayload());
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")->getJson('/api/recipes?mine=1');
+
+    $response->assertOk()->assertJsonPath('0.ingredients.0.ingredientName', 'Cenoura');
+});

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Application\Recipe\DTOs\RecipeOutput;
+use App\Domain\Ingredient\Contracts\IngredientRepositoryInterface;
 use App\Domain\Media\Contracts\MediaRepositoryInterface;
 use App\Domain\Media\Contracts\MediaUrlSignerInterface;
 use App\Domain\Media\Enums\MediaStatus;
@@ -20,6 +21,7 @@ class RecipeResource extends JsonResource
     {
         $owner = $this->resolveOwner();
         $cover = $this->resolveCoverUrls();
+        $ingredientNames = $this->resolveIngredientNames();
 
         return [
             'id' => $this->resource->id,
@@ -39,8 +41,9 @@ class RecipeResource extends JsonResource
                 ? round($this->resource->averageRating, 1)
                 : null,
             'ratingsCount' => $this->resource->ratingsCount,
-            'ingredients' => array_map(static fn ($ingredient) => [
+            'ingredients' => array_map(fn ($ingredient) => [
                 'ingredientId' => $ingredient->ingredientId,
+                'ingredientName' => $ingredientNames[$ingredient->ingredientId] ?? null,
                 'quantity' => $ingredient->quantity,
                 'unit' => $ingredient->unit,
                 'position' => $ingredient->position,
@@ -56,6 +59,27 @@ class RecipeResource extends JsonResource
     private function resolveOwner(): ?User
     {
         return app(UserRepositoryInterface::class)->findById(Ulid::fromString($this->resource->ownerId));
+    }
+
+    /**
+     * One query for the whole recipe (not one per line), mirroring how the owner and
+     * cover are resolved above.
+     *
+     * @return array<string, string> ingredient id => display name
+     */
+    private function resolveIngredientNames(): array
+    {
+        $ids = array_map(
+            static fn ($ingredient) => Ulid::fromString($ingredient->ingredientId),
+            $this->resource->ingredients,
+        );
+
+        $names = [];
+        foreach (app(IngredientRepositoryInterface::class)->findByIds($ids) as $id => $ingredient) {
+            $names[$id] = $ingredient->name()->value();
+        }
+
+        return $names;
     }
 
     /**
