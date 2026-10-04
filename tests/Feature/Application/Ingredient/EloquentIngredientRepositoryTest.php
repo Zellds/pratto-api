@@ -45,3 +45,32 @@ it('searches by prefix and by trigram similarity, ranked, most similar first', f
         ->and($typoResults)->not->toBeEmpty()
         ->and($typoResults[0]->name()->value())->toStartWith('Tomate');
 });
+
+it('finds several ingredients by id, keyed by the id value', function () {
+    $repository = app(IngredientRepositoryInterface::class);
+    $carrot = Ingredient::createProvisional(Ulid::generate(), IngredientName::fromString('Cenoura'));
+    $onion = Ingredient::createProvisional(Ulid::generate(), IngredientName::fromString('Cebola'));
+    $repository->save($carrot);
+    $repository->save($onion);
+
+    $found = $repository->findByIds([$carrot->id(), $onion->id()]);
+
+    expect($found)->toHaveCount(2)
+        ->and($found[$carrot->id()->value()]->name()->value())->toBe('Cenoura')
+        ->and($found[$onion->id()->value()]->name()->value())->toBe('Cebola');
+});
+
+it('omits unknown ids when finding several ingredients by id', function () {
+    $repository = app(IngredientRepositoryInterface::class);
+    $carrot = Ingredient::createProvisional(Ulid::generate(), IngredientName::fromString('Cenoura'));
+    $repository->save($carrot);
+
+    $found = $repository->findByIds([$carrot->id(), Ulid::generate()]);
+
+    expect($found)->toHaveCount(1)
+        ->and(array_keys($found))->toBe([$carrot->id()->value()]);
+});
+
+it('returns an empty array when finding by an empty list of ids', function () {
+    expect(app(IngredientRepositoryInterface::class)->findByIds([]))->toBe([]);
+});

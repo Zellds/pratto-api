@@ -9,6 +9,12 @@ interface IngredientRepositoryInterface
 {
     public function findById(Ulid $id): ?Ingredient;
 
+    /**
+     * @param  list<Ulid>  $ids
+     * @return array<string, Ingredient> keyed by the ingredient id value; unknown ids are omitted
+     */
+    public function findByIds(array $ids): array;
+
     public function findByNormalizedName(string $normalizedName): ?Ingredient;
 
     /**

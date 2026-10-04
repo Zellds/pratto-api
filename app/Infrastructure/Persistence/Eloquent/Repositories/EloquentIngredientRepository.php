@@ -19,6 +19,24 @@ final class EloquentIngredientRepository implements IngredientRepositoryInterfac
         return $record === null ? null : $this->toDomain($record);
     }
 
+    public function findByIds(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $records = EloquentIngredient::query()
+            ->whereIn('id', array_map(static fn (Ulid $id) => $id->value(), $ids))
+            ->get();
+
+        $ingredients = [];
+        foreach ($records as $record) {
+            $ingredients[$record->id] = $this->toDomain($record);
+        }
+
+        return $ingredients;
+    }
+
     public function findByNormalizedName(string $normalizedName): ?Ingredient
     {
         $record = EloquentIngredient::query()->where('normalized_name', $normalizedName)->first();
